@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2026 GTM Campaign Calendar</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Mono:wght@300;400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #F5F0E8; --dark: #1C1A16; --olive: #4A4A2A;
+    --rust: #C4440A; --sage: #6B7B5E; --sand: #D4C5A9;
+    --gold: #B8922A; --sky: #3B6E8C;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--cream); color:var(--dark); font-family:'Instrument Sans',sans-serif; min-height:100vh; }
+
+  /* ── API KEY GATE ── */
+  #api-gate {
+    position:fixed; inset:0; background:var(--dark); z-index:1000;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .gate-box {
+    background:var(--cream); border-radius:8px; padding:48px;
+    max-width:480px; width:90%; border-top:4px solid var(--rust);
+  }
+  .gate-box h2 { font-family:'DM Serif Display',serif; font-size:1.6rem; margin-bottom:8px; }
+  .gate-box p { font-size:.8rem; color:var(--olive); line-height:1.6; margin-bottom:24px; }
+  .gate-box input {
+    width:100%; padding:12px 14px; border:1.5px solid var(--sand); border-radius:4px;
+    font-family:'DM Mono',monospace; font-size:.7rem; background:white;
+    color:var(--dark); margin-bottom:8px; outline:none;
+  }
+  .gate-box input:focus { border-color:var(--rust); }
+  .gate-box button {
+    width:100%; padding:12px; background:var(--rust); color:var(--cream);
+    border:none; border-radius:4px; font-family:'DM Mono',monospace;
+    font-size:.7rem; letter-spacing:.1em; text-transform:uppercase;
+    cursor:pointer; margin-top:8px; transition:opacity .2s;
+  }
+  .gate-box button:hover { opacity:.85; }
+  .gate-error { font-family:'DM Mono',monospace; font-size:.62rem; color:var(--rust); margin-top:8px; display:none; }
+  .gate-hint { font-family:'DM Mono',monospace; font-size:.58rem; color:var(--sand); margin-top:12px; line-height:1.6; }
+
+  header {
+    background:var(--dark); padding:26px 48px;
+    display:flex; align-items:center; justify-content:space-between;
+    position:sticky; top:0; z-index:100; border-bottom:2px solid var(--rust);
+  }
+  .logo h1 { font-family:'DM Serif Display',serif; font-size:1.35rem; color:var(--cream); }
+  .logo p { font-family:'DM Mono',monospace; font-size:.62rem; color:var(--sand); letter-spacing:.15em; text-transform:uppercase; margin-top:3px; }
+  .header-right { font-family:'DM Mono',monospace; font-size:.65rem; color:var(--sand); text-align:right; }
+  .live-dot { display:inline-block; width:6px; height:6px; background:var(--rust); border-radius:50%; margin-right:5px; animation:blink 2s infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+  main { padding:40px 48px 80px; max-width:1440px; margin:0 auto; }
+
+  .status-bar {
+    background:var(--dark); border-radius:4px; padding:16px 24px;
+    display:flex; align-items:center; gap:24px; flex-wrap:wrap; margin-bottom:36px;
+  }
+  .slabel { font-family:'DM Mono',monospace; font-size:.58rem; letter-spacing:.2em; text-transform:uppercase; color:var(--sand); }
+  .pill { display:flex; align-items:center; gap:6px; font-family:'DM Mono',monospace; font-size:.62rem; color:var(--cream); }
+  .pdot { width:8px; height:8px; border-radius:50%; }
+  .pbar { width:16px; height:5px; border-radius:2px; }
+
+  .section-header { display:flex; align-items:baseline; gap:16px; margin-bottom:12px; }
+  .section-header h2 { font-family:'DM Serif Display',serif; font-size:1.9rem; }
+  .section-header span { font-family:'DM Mono',monospace; font-size:.62rem; color:var(--sage); letter-spacing:.12em; text-transform:uppercase; }
+
+  .month-axis { display:grid; grid-template-columns:200px 1fr 160px; gap:28px; margin-bottom:4px; }
+  .months-row { display:flex; justify-content:space-between; }
+  .mtick { font-family:'DM Mono',monospace; font-size:.55rem; letter-spacing:.1em; color:var(--sand); text-transform:uppercase; }
+
+  .campaigns-list { display:flex; flex-direction:column; }
+  .campaign-row {
+    border-top:1px solid var(--sand); padding:28px 0;
+    display:grid; grid-template-columns:200px 1fr 160px; gap:28px; align-items:start;
+    opacity:0; transform:translateY(12px); transition:opacity .4s ease,transform .4s ease;
+  }
+  .campaign-row.visible { opacity:1; transform:translateY(0); }
+  .campaign-row:last-child { border-bottom:1px solid var(--sand); }
+
+  .card-meta h2 { font-family:'DM Serif Display',serif; font-size:1.1rem; line-height:1.2; margin-bottom:8px; }
+  .badge {
+    display:inline-flex; align-items:center; gap:5px;
+    padding:2px 9px 2px 5px; border-radius:20px;
+    font-family:'DM Mono',monospace; font-size:.58rem; letter-spacing:.08em; text-transform:uppercase; font-weight:500; margin-bottom:8px;
+  }
+  .launch-tag { font-family:'DM Mono',monospace; font-size:.62rem; color:var(--olive); }
+  .launch-tag strong { color:var(--dark); }
+
+  .timeline { position:relative; padding-top:24px; }
+  .track-bar { height:3px; background:var(--sand); border-radius:2px; position:relative; margin-top:4px; }
+  .track-fill { height:100%; border-radius:2px; position:absolute; left:0; }
+  .milestones { position:relative; height:52px; margin-top:6px; }
+  .ms { position:absolute; transform:translateX(-50%); display:flex; flex-direction:column; align-items:center; cursor:default; }
+  .ms-dot { width:9px; height:9px; border-radius:50%; border:2px solid var(--cream); box-shadow:0 0 0 1.5px currentColor; margin-bottom:3px; transition:transform .2s; }
+  .ms.launch .ms-dot { width:12px; height:12px; }
+  .ms:hover .ms-dot { transform:scale(1.5); }
+  .ms-label { font-family:'DM Mono',monospace; font-size:.48rem; color:var(--olive); white-space:nowrap; text-align:center; line-height:1.3; }
+  .ms-label strong { font-size:.52rem; color:var(--dark); display:block; }
+  .ms-tip {
+    display:none; position:absolute; top:-32px; left:50%; transform:translateX(-50%);
+    background:var(--dark); color:var(--cream); font-family:'DM Mono',monospace; font-size:.5rem;
+    padding:3px 7px; border-radius:3px; white-space:nowrap; z-index:20; pointer-events:none;
+  }
+  .ms:hover .ms-tip { display:block; }
+
+  .card-note { grid-column:2/4; font-size:.68rem; color:var(--sage); font-style:italic; border-left:2px solid var(--sand); padding:6px 12px; margin-top:-10px; line-height:1.6; }
+  .card-side { padding-top:2px; }
+  .side-hdr { font-family:'DM Mono',monospace; font-size:.52rem; letter-spacing:.15em; text-transform:uppercase; color:var(--sage); margin-bottom:8px; }
+  .side-item { display:flex; align-items:flex-start; gap:7px; margin-bottom:5px; }
+  .side-bar { width:3px; height:13px; border-radius:2px; flex-shrink:0; margin-top:2px; }
+  .side-text { font-size:.62rem; color:var(--olive); line-height:1.4; }
+  .side-text strong { font-family:'DM Mono',monospace; font-size:.58rem; display:block; color:var(--dark); margin-bottom:1px; }
+
+  .loading-state { text-align:center; padding:80px 20px; font-family:'DM Mono',monospace; font-size:.7rem; color:var(--sage); letter-spacing:.1em; }
+  .spinner { width:24px; height:24px; border:2px solid var(--sand); border-top-color:var(--rust); border-radius:50%; animation:spin .8s linear infinite; margin:0 auto 16px; }
+  @keyframes spin { to{transform:rotate(360deg)} }
+  .error-box { background:#FDF0EC; border:1px solid var(--rust); border-radius:4px; padding:20px 24px; font-family:'DM Mono',monospace; font-size:.65rem; color:var(--rust); margin:40px 0; line-height:1.8; }
+  .fetched-at { font-family:'DM Mono',monospace; font-size:.55rem; color:var(--sand); text-align:right; margin-top:20px; }
+  footer { text-align:center; padding:20px; font-family:'DM Mono',monospace; font-size:.58rem; color:var(--sand); letter-spacing:.1em; border-top:1px solid var(--sand); }
+
+  @media(max-width:860px){
+    header{padding:18px 20px;} main{padding:24px 20px 60px;}
+    .campaign-row{grid-template-columns:1fr;gap:16px;}
+    .card-note{grid-column:1;} .month-axis{display:none;}
+  }
+</style>
+</head>
+<body>
+
+<!-- API KEY GATE — key never stored, only lives in memory -->
+<div id="api-gate">
+  <div class="gate-box">
+    <h2>GTM Campaign Calendar</h2>
+    <p>Enter your Airtable API token to load live campaign data. This is only stored in memory and is never saved anywhere.</p>
+    <input type="password" id="api-input" placeholder="pat2Cxq8iNkH1Djt6..." autocomplete="off" />
+    <div id="gate-error" class="gate-error">Could not connect — check your token and try again.</div>
+    <button onclick="unlock()">Load Calendar →</button>
+    <div class="gate-hint">
+      Token lives in memory only · Refreshing the page will clear it<br>
+      Scope needed: data.records:read on LIVE - 2026 Marketing Campaign Tracker
+    </div>
+  </div>
+</div>
+
+<header>
+  <div class="logo">
+    <h1>GTM Campaign Calendar</h1>
+    <p>Innovation Summary · 2026</p>
+  </div>
+  <div class="header-right">
+    <div><span class="live-dot"></span>Live · Airtable</div>
+    <div id="clock" style="margin-top:4px;"></div>
+  </div>
+</header>
+
+<main>
+  <div class="status-bar">
+    <span class="slabel">Status</span>
+    <div class="pill"><div class="pdot" style="background:#6B7B5E"></div>Done</div>
+    <div class="pill"><div class="pdot" style="background:#3B6E8C"></div>In Progress</div>
+    <div class="pill"><div class="pdot" style="background:#B8922A"></div>Waiting</div>
+    <div class="pill"><div class="pdot" style="background:#C4440A"></div>To Do</div>
+    <div style="margin-left:auto;display:flex;gap:18px;flex-wrap:wrap;">
+      <div class="pill"><div class="pbar" style="background:#6B7B5E"></div>Planning</div>
+      <div class="pill"><div class="pbar" style="background:#3B6E8C"></div>Execution</div>
+      <div class="pill"><div class="pbar" style="background:#C4440A"></div>Launch</div>
+    </div>
+  </div>
+
+  <div class="section-header">
+    <h2>Active Campaigns</h2>
+    <span id="campaign-count">Loading...</span>
+  </div>
+
+  <div class="month-axis">
+    <div></div>
+    <div class="months-row">
+      <span class="mtick">Feb</span><span class="mtick">Mar</span><span class="mtick">Apr</span>
+      <span class="mtick">May</span><span class="mtick">Jun</span><span class="mtick">Jul</span>
+    </div>
+    <div></div>
+  </div>
+
+  <div id="campaigns-list" class="campaigns-list">
+    <div class="loading-state"><div class="spinner"></div>Waiting for token...</div>
+  </div>
+  <div id="fetched-at" class="fetched-at"></div>
+</main>
+
+<footer>Force of Nature · Marketing Operations · 2026 GTM · Live data via Airtable</footer>
+
+<script>
+const BASE_ID    = "appeiBEuOf8zRHX96";
+const TABLE_NAME = "[MASTER] Milestones";
+
+const CAMPAIGNS = [
+  { match: "beef tallow",         name: "Beef Tallow",         color: "#6B7B5E" },
+  { match: "force of nature",     name: "Force of Nature",     color: "#3B6E8C" },
+  { match: "sams",                name: "Sam's Club",          color: "#B8922A" },
+  { match: "flavored bone broth", name: "Flavored Bone Broth", color: "#C4440A" },
+];
+
+const MILESTONE_KEYS = [
+  { match: "campaign kick-off",                  label: "Kick-Off", color: "#6B7B5E" },
+  { match: "first half campaign plan approved",  label: "Strategy", color: "#6B7B5E" },
+  { match: "second half campaign plan approved", label: "Creative", color: "#3B6E8C" },
+  { match: "finalized campaign plan deck",       label: "Deck",     color: "#B8922A" },
+  { match: "briefing request in notion",         label: "Brief",    color: "#B8922A" },
+  { match: "finalized creative asset delivered", label: "Assets",   color: "#3B6E8C" },
+  { match: "dtc launch",                         label: "🚀 Launch", color: "#C4440A", isLaunch: true },
+  { match: "retailer launch",                    label: "🚀 Launch", color: "#C4440A", isLaunch: true },
+];
+
+const RANGE_START = new Date("2026-02-01");
+const RANGE_END   = new Date("2026-07-31");
+const RANGE_DAYS  = (RANGE_END - RANGE_START) / 86400000;
+
+function pct(d) {
+  if (!d) return null;
+  const dt = new Date(d);
+  if (isNaN(dt)) return null;
+  return Math.min(100, Math.max(0, ((dt - RANGE_START) / 86400000 / RANGE_DAYS) * 100));
+}
+function fmt(d) {
+  if (!d) return "—";
+  const dt = new Date(d);
+  return isNaN(dt) ? d : dt.toLocaleDateString("en-US", { month:"numeric", day:"numeric" });
+}
+function statusStyle(s) {
+  if (!s) return { bg:"#F0EDE6", color:"#B8922A", dot:"#B8922A", label:"Waiting" };
+  const l = s.toLowerCase();
+  if (l.includes("done")||l.includes("complete")) return { bg:"#E8F0E4", color:"#6B7B5E", dot:"#6B7B5E", label:s };
+  if (l.includes("progress"))                      return { bg:"#E4ECF2", color:"#3B6E8C", dot:"#3B6E8C", label:s };
+  if (l.includes("not started"))                   return { bg:"#F5EDE8", color:"#C4440A", dot:"#C4440A", label:s };
+  return { bg:"#F0EDE6", color:"#B8922A", dot:"#B8922A", label:s };
+}
+
+async function fetchAll(apiKey) {
+  const encoded = encodeURIComponent(TABLE_NAME);
+  let all = [], offset = null;
+  do {
+    const url = `https://api.airtable.com/v0/${BASE_ID}/${encoded}?pageSize=100${offset?"&offset="+offset:""}`;
+    const res = await fetch(url, { headers: { Authorization: "Bearer " + apiKey } });
+    if (!res.ok) throw new Error("Airtable " + res.status);
+    const data = await res.json();
+    all = all.concat(data.records || []);
+    offset = data.offset || null;
+  } while (offset);
+  return all;
+}
+
+function processRecords(records) {
+  const groups = {};
+  for (const r of records) {
+    const f = r.fields;
+    let raw = "";
+    if (typeof f["Campaign"] === "string") raw = f["Campaign"].toLowerCase();
+    else if (Array.isArray(f["Campaign"])) raw = (f["Campaign"][0]||"").toLowerCase();
+    const camp = CAMPAIGNS.find(c => raw.includes(c.match));
+    if (!camp) continue;
+    if (!groups[camp.name]) groups[camp.name] = { ...camp, rows: [] };
+    groups[camp.name].rows.push(f);
+  }
+
+  return CAMPAIGNS.map(c => {
+    const g = groups[c.name];
+    if (!g) return { name:c.name, color:c.color, milestones:[], status:"Not started" };
+    const milestones = [];
+    for (const f of g.rows) {
+      const mRaw = (f["Milestones"]||f["Name"]||"").toLowerCase();
+      const key = MILESTONE_KEYS.find(k => mRaw.includes(k.match));
+      if (!key || milestones.find(m => m.label===key.label)) continue;
+      milestones.push({ label:key.label, color:key.color, isLaunch:!!key.isLaunch, date: f["Auto Start Date"]||f["Start Date"]||null });
+    }
+    milestones.sort((a,b) => !a.date?1:!b.date?-1:new Date(a.date)-new Date(b.date));
+    const statuses = g.rows.map(f=>(f["Status"]||"").toLowerCase());
+    let status = "To do";
+    if (statuses.every(s=>s==="done"||s==="complete")) status = "Done";
+    else if (statuses.some(s=>s.includes("progress")||s==="done")) status = "In Progress";
+    return { name:c.name, color:c.color, milestones, status };
+  });
+}
+
+function renderCampaign(c) {
+  const plotted = c.milestones.map(m=>({...m,p:pct(m.date),d:fmt(m.date)})).filter(m=>m.p!==null);
+  const ss = statusStyle(c.status);
+  const launch = plotted.find(m=>m.isLaunch);
+  const ps = plotted.map(m=>m.p);
+  const fillL = ps.length?Math.min(...ps):0;
+  const fillW = ps.length?Math.max(...ps)-fillL:0;
+  const msHtml = plotted.map(m=>`
+    <div class="ms ${m.isLaunch?'launch':''}" style="left:${m.p.toFixed(1)}%;color:${m.color};">
+      <div class="ms-tip">${m.label} — ${m.d}</div>
+      <div class="ms-dot" style="color:${m.color};"></div>
+      <div class="ms-label"><strong>${m.d}</strong>${m.label}</div>
+    </div>`).join("");
+  const sideHtml = plotted.map(m=>`
+    <div class="side-item">
+      <div class="side-bar" style="background:${m.color};"></div>
+      <div class="side-text"><strong>${m.label}</strong>${m.d}</div>
+    </div>`).join("");
+  return `
+    <div class="campaign-row">
+      <div class="card-meta">
+        <h2>${c.name}</h2>
+        <div class="badge" style="background:${ss.bg};color:${ss.color};">
+          <div class="pdot" style="background:${ss.dot};width:7px;height:7px;border-radius:50%;"></div>${ss.label}
+        </div><br>
+        <div class="launch-tag">Launch <strong>${launch?launch.d:"TBD"}</strong></div>
+      </div>
+      <div class="timeline">
+        <div class="track-bar">
+          <div class="track-fill" style="left:${fillL.toFixed(1)}%;width:${fillW.toFixed(1)}%;background:${c.color};opacity:.45;"></div>
+        </div>
+        <div class="milestones">
+          ${plotted.length?msHtml:'<div style="font-family:\'DM Mono\',monospace;font-size:.58rem;color:var(--sand);padding-top:16px;">No milestone dates found</div>'}
+        </div>
+      </div>
+      <div class="card-side">
+        <div class="side-hdr">Key Dates</div>
+        ${sideHtml||'<div class="side-text" style="color:var(--sand);">Waiting</div>'}
+      </div>
+      ${c.placeholder?'<div class="card-note" style="grid-column:2/4;">Planning not yet started.</div>':""}
+    </div>`;
+}
+
+async function unlock() {
+  const apiKey = document.getElementById("api-input").value.trim();
+  const errEl  = document.getElementById("gate-error");
+  errEl.style.display = "none";
+  if (!apiKey) { errEl.textContent="Please enter your token."; errEl.style.display="block"; return; }
+
+  try {
+    // Test the key with a single record fetch
+    const testUrl = `https://api.airtable.com/v0/${BASE_ID}/${encodeURIComponent(TABLE_NAME)}?pageSize=1`;
+    const test = await fetch(testUrl, { headers:{ Authorization:"Bearer "+apiKey } });
+    if (!test.ok) throw new Error("Invalid token or no access");
+
+    // Hide gate, load data
+    document.getElementById("api-gate").style.display = "none";
+    loadData(apiKey);
+  } catch(e) {
+    errEl.textContent = "Could not connect — check your token and try again.";
+    errEl.style.display = "block";
+  }
+}
+
+// Allow pressing Enter to submit
+document.getElementById("api-input").addEventListener("keydown", e => { if(e.key==="Enter") unlock(); });
+
+async function loadData(apiKey) {
+  const container = document.getElementById("campaigns-list");
+  const countEl   = document.getElementById("campaign-count");
+  const fetchedEl = document.getElementById("fetched-at");
+  container.innerHTML = '<div class="loading-state"><div class="spinner"></div>Fetching live data from Airtable...</div>';
+  try {
+    const records   = await fetchAll(apiKey);
+    const campaigns = processRecords(records);
+    campaigns.push({ name:"Back to School", color:"#B8922A", milestones:[], status:"Waiting", placeholder:true });
+    countEl.textContent = campaigns.length + " campaigns · Q1–Q3 2026";
+    container.innerHTML = campaigns.map(renderCampaign).join("");
+    container.querySelectorAll(".campaign-row").forEach((r,i)=>setTimeout(()=>r.classList.add("visible"),i*100));
+    const d = new Date();
+    fetchedEl.textContent = "Data fetched " + d.toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"}) + " at " + d.toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit"});
+  } catch(e) {
+    countEl.textContent = "Error loading";
+    container.innerHTML = `<div class="error-box"><strong>Could not load data.</strong><br><br>${e.message}</div>`;
+  }
+}
+
+document.getElementById("clock").textContent = new Date().toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"});
+</script>
+</body>
+</html>
