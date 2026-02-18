@@ -16,42 +16,20 @@
     --border:   #cdc8bb;
     --nav-bg:   #1e1e1a;
     --nav-text: #e8e4dc;
-
-    --c-planning:  #5a8a5a;
-    --c-execution: #4a7aaf;
-    --c-launch:    #bf5030;
-    --c-review:    #8a6030;
-    --c-done:      #8a9a88;
-
-    --label-w: 220px;
-    --row-padding: 80px;   /* vertical space for label + date above/below line */
+    --label-w:  220px;
+    --row-h:    180px;   /* tall enough for labels above + below */
+    --mid:      50%;     /* midpoint of row = where the arrow line sits */
     --font-serif: 'Playfair Display', serif;
     --font-mono:  'DM Mono', monospace;
     --font-ui:    'Inter', sans-serif;
   }
-
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--cream); color: var(--ink); font-family: var(--font-ui); min-height: 100vh; }
 
-  body {
-    background: var(--cream);
-    color: var(--ink);
-    font-family: var(--font-ui);
-    min-height: 100vh;
-  }
-
-  /* ── MODAL ──────────────────────────────── */
-  #modal-overlay {
-    position: fixed; inset: 0; z-index: 999;
-    background: rgba(26,26,24,.82);
-    backdrop-filter: blur(6px);
-    display: flex; align-items: center; justify-content: center;
-  }
+  /* ── MODAL ──────────────────────────── */
+  #modal-overlay { position: fixed; inset: 0; z-index: 999; background: rgba(26,26,24,.82); backdrop-filter: blur(6px); display: flex; align-items: center; justify-content: center; }
   #modal-overlay.hidden { display: none; }
-  .modal-box {
-    background: var(--cream); border: 1px solid var(--border);
-    border-radius: 4px; padding: 48px; width: min(460px, 92vw);
-    box-shadow: 0 32px 80px rgba(0,0,0,.35);
-  }
+  .modal-box { background: var(--cream); border: 1px solid var(--border); border-radius: 4px; padding: 48px; width: min(460px, 92vw); box-shadow: 0 32px 80px rgba(0,0,0,.35); }
   .modal-eye  { font-family: var(--font-mono); font-size: 10px; letter-spacing: .14em; color: var(--muted); text-transform: uppercase; margin-bottom: 12px; }
   .modal-head { font-family: var(--font-serif); font-size: 26px; line-height: 1.2; margin-bottom: 10px; }
   .modal-sub  { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 26px; }
@@ -61,211 +39,62 @@
   .modal-btn  { width: 100%; background: var(--ink); color: var(--cream); border: none; border-radius: 3px; padding: 13px; font-family: var(--font-ui); font-weight: 600; font-size: 13px; letter-spacing: .04em; cursor: pointer; transition: opacity .15s; }
   .modal-btn:hover { opacity: .82; }
   .modal-btn:disabled { opacity: .4; cursor: default; }
-  .modal-err  { font-size: 12px; color: var(--c-launch); margin-top: 10px; min-height: 16px; font-family: var(--font-mono); }
+  .modal-err  { font-size: 12px; color: #bf5030; margin-top: 10px; min-height: 16px; font-family: var(--font-mono); }
 
-  /* ── NAV ────────────────────────────────── */
-  nav {
-    background: var(--nav-bg); color: var(--nav-text);
-    display: flex; align-items: center; padding: 0 32px;
-    height: 42px; gap: 0; flex-wrap: nowrap; overflow: hidden;
-  }
+  /* ── NAV ────────────────────────────── */
+  nav { background: var(--nav-bg); color: var(--nav-text); display: flex; align-items: center; padding: 0 32px; height: 42px; gap: 0; }
   .nav-section { display: flex; align-items: center; gap: 14px; }
-  .nav-lbl { font-family: var(--font-mono); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: rgba(232,228,220,.4); margin-right: 4px; }
-  .nav-item { display: flex; align-items: center; gap: 5px; font-family: var(--font-mono); font-size: 11px; color: rgba(232,228,220,.8); white-space: nowrap; }
+  .nav-lbl { font-family: var(--font-mono); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: rgba(232,228,220,.4); margin-right: 6px; }
+  .nav-item { display: flex; align-items: center; gap: 5px; font-family: var(--font-mono); font-size: 11px; color: rgba(232,228,220,.8); }
   .ndot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
   .nav-spacer { flex: 1; }
   .nav-live { font-family: var(--font-mono); font-size: 10px; color: rgba(232,228,220,.45); display: flex; align-items: center; gap: 6px; }
-  .live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--c-planning); }
+  .live-dot { width: 6px; height: 6px; border-radius: 50%; }
   @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
 
-  /* ── PAGE HEAD ──────────────────────────── */
-  .page-head {
-    padding: 32px 32px 16px;
-    border-bottom: 2px solid var(--ink);
-    display: flex; align-items: baseline; gap: 20px; flex-wrap: wrap;
-  }
+  /* ── PAGE HEAD ──────────────────────── */
+  .page-head { padding: 28px 32px 16px; border-bottom: 2px solid var(--ink); display: flex; align-items: baseline; gap: 18px; flex-wrap: wrap; }
   .page-head h1 { font-family: var(--font-serif); font-size: 36px; font-weight: 800; color: var(--ink); line-height: 1; }
   .page-meta { font-family: var(--font-mono); font-size: 11px; color: var(--muted); letter-spacing: .08em; text-transform: uppercase; }
-  .page-actions { margin-left: auto; display: flex; align-items: center; gap: 10px; }
-  #refresh-btn {
-    display: flex; align-items: center; gap: 6px; background: transparent;
-    border: 1px solid var(--border); border-radius: 2px; color: var(--muted);
-    font-family: var(--font-mono); font-size: 11px; padding: 5px 12px;
-    cursor: pointer; transition: all .15s; white-space: nowrap;
-  }
+  .page-actions { margin-left: auto; }
+  #refresh-btn { display: flex; align-items: center; gap: 6px; background: transparent; border: 1px solid var(--border); border-radius: 2px; color: var(--muted); font-family: var(--font-mono); font-size: 11px; padding: 5px 12px; cursor: pointer; transition: all .15s; }
   #refresh-btn:hover { border-color: var(--ink); color: var(--ink); }
-  #sdot { width: 6px; height: 6px; border-radius: 50%; background: var(--muted); transition: background .3s; flex-shrink: 0; }
-  #sdot.live    { background: var(--c-planning); }
-  #sdot.loading { background: var(--c-review); animation: blink 1s infinite; }
-  #sdot.error   { background: var(--c-launch); }
+  #sdot { width: 6px; height: 6px; border-radius: 50%; background: var(--muted); flex-shrink: 0; }
+  #sdot.live    { background: #5a8a5a; }
+  #sdot.loading { background: #c4a44a; animation: blink 1s infinite; }
+  #sdot.error   { background: #bf5030; }
 
-  /* ── MAIN ───────────────────────────────── */
+  /* ── MAIN ───────────────────────────── */
   main { opacity: 0; transition: opacity .35s; }
   main.visible { opacity: 1; }
   #msg { padding: 80px 32px; text-align: center; font-family: var(--font-mono); font-size: 13px; color: var(--muted); }
-
   .scroll-wrap { overflow-x: auto; overflow-y: visible; }
-  .tl-root { min-width: 900px; }
+  .tl-root { min-width: 960px; }
 
-  /* ── MONTH HEADER ───────────────────────── */
-  .month-header {
-    position: sticky; top: 0; z-index: 10;
-    background: var(--cream2);
-    border-bottom: 1px solid var(--border);
-    display: flex; height: 32px;
-  }
+  /* ── MONTH HEADER ───────────────────── */
+  .month-header { position: sticky; top: 0; z-index: 10; background: var(--cream2); border-bottom: 1px solid var(--border); display: flex; height: 32px; }
   .mh-spacer { flex-shrink: 0; width: var(--label-w); border-right: 1px solid var(--border); }
   .mh-track  { flex: 1; position: relative; overflow: hidden; }
-  .mh-cell {
-    position: absolute; top: 0; bottom: 0;
-    display: flex; align-items: center; padding-left: 8px;
-    font-family: var(--font-mono); font-size: 10px; color: var(--muted);
-    letter-spacing: .09em; text-transform: uppercase;
-    border-left: 1px solid var(--border); white-space: nowrap;
-  }
+  .mh-cell { position: absolute; top: 0; bottom: 0; display: flex; align-items: center; padding-left: 8px; font-family: var(--font-mono); font-size: 10px; color: var(--muted); letter-spacing: .09em; text-transform: uppercase; border-left: 1px solid var(--border); white-space: nowrap; }
 
-  /* ── CAMPAIGN ROW ───────────────────────── */
-  .camp-group {
-    border-bottom: 1px solid var(--border);
-    background: var(--cream);
-  }
-  .camp-row { display: flex; align-items: stretch; }
+  /* ── CAMPAIGN ROW ───────────────────── */
+  .camp-group { border-bottom: 1px solid var(--border); background: var(--cream); }
+  .camp-row   { display: flex; align-items: stretch; }
 
-  /* Left label */
-  .camp-lbl {
-    flex-shrink: 0; width: var(--label-w);
-    padding: 0 20px;
-    border-right: 1px solid var(--border);
-    display: flex; flex-direction: column; justify-content: center;
-    gap: 5px; min-height: 140px;
-  }
-  .camp-name { font-family: var(--font-serif); font-size: 15px; font-weight: 700; color: var(--ink); line-height: 1.25; }
-  .camp-launch { font-family: var(--font-mono); font-size: 10px; color: var(--muted); letter-spacing: .04em; margin-top: 2px; }
+  .camp-lbl { flex-shrink: 0; width: var(--label-w); padding: 0 20px; border-right: 1px solid var(--border); display: flex; flex-direction: column; justify-content: center; gap: 5px; min-height: var(--row-h); }
+  .camp-name   { font-family: var(--font-serif); font-size: 15px; font-weight: 700; color: var(--ink); line-height: 1.25; }
+  .camp-launch { font-family: var(--font-mono); font-size: 10px; color: var(--muted); margin-top: 2px; }
 
-  /* Timeline canvas */
-  .camp-tl {
-    flex: 1;
-    position: relative;
-    min-height: 140px;  /* enough room for label above + date below the line */
-  }
+  /* The SVG-based timeline fills this div */
+  .camp-tl { flex: 1; position: relative; height: var(--row-h); }
+  .camp-tl svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
 
-  /* Month grid lines */
-  .grid-line  { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--border); pointer-events: none; }
-  .today-line { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--ink); opacity: .25; pointer-events: none; z-index: 1; }
-  .today-lbl  {
-    position: absolute; top: 4px; transform: translateX(-50%);
-    font-family: var(--font-mono); font-size: 8px; color: var(--ink); opacity: .4;
-    letter-spacing: .07em; white-space: nowrap; pointer-events: none; z-index: 1;
-    text-transform: uppercase;
-  }
-
-  /* Horizontal timeline arrow */
-  .tl-line {
-    position: absolute;
-    top: 50%; transform: translateY(-50%);
-    left: 0; right: 28px;
-    height: 1.5px; background: var(--ink2); opacity: .3;
-    pointer-events: none;
-  }
-  /* Arrow head */
-  .tl-arrow {
-    position: absolute;
-    top: 50%; transform: translateY(-50%);
-    right: 0;
-    width: 0; height: 0;
-    border-top: 7px solid transparent;
-    border-bottom: 7px solid transparent;
-    border-left: 14px solid var(--ink2);
-    opacity: .3;
-    pointer-events: none;
-  }
-
-  /* ── MILESTONE MARKER ───────────────────── */
-  /*
-    Each milestone is a vertical tick at its date position.
-    Label rendered above or below alternating to avoid overlap.
-    Structure:
-      .ms-marker (positioned absolutely)
-        .ms-label-above or .ms-label-below
-        .ms-tick
-        .ms-date-above or .ms-date-below
-  */
-  .ms-marker {
-    position: absolute;
-    top: 0; bottom: 0;
-    display: flex; flex-direction: column; align-items: center;
-    cursor: pointer;
-    transform: translateX(-50%);
-    z-index: 5;
-  }
-  .ms-marker:hover .ms-tick { background: var(--ink); opacity: 1; }
-  .ms-marker:hover .ms-box  { border-color: var(--ink); color: var(--ink); }
-
-  /* Box label (like screenshot 2) */
-  .ms-box {
-    background: var(--cream);
-    border: 1px solid var(--ink2);
-    border-radius: 2px;
-    padding: 4px 7px;
-    font-family: var(--font-ui); font-size: 10px; font-weight: 500;
-    color: var(--ink2);
-    text-align: center;
-    line-height: 1.3;
-    max-width: 110px;
-    white-space: normal;
-    word-break: break-word;
-    transition: border-color .12s, color .12s;
-    pointer-events: none;
-  }
-  .ms-box.done { opacity: .45; background: var(--cream2); }
-
-  /* Tick line connecting box to the horizontal line */
-  .ms-tick {
-    width: 1px; background: var(--ink2); opacity: .5;
-    flex: 1;
-    pointer-events: none;
-    transition: opacity .12s;
-  }
-
-  /* Date label */
-  .ms-date {
-    font-family: var(--font-mono); font-size: 10px; font-weight: 500;
-    color: var(--ink); letter-spacing: .02em;
-    white-space: nowrap;
-    padding: 2px 0;
-    pointer-events: none;
-  }
-  .ms-date.done { opacity: .45; }
-
-  /* Diamond on the line */
-  .ms-diamond {
-    width: 8px; height: 8px;
-    background: var(--ink);
-    transform: rotate(45deg);
-    flex-shrink: 0;
-    pointer-events: none;
-    transition: transform .12s;
-  }
-  .ms-diamond.done { background: var(--muted); }
-  .ms-marker:hover .ms-diamond { transform: rotate(45deg) scale(1.4); }
-
-  /* Tooltip */
-  .tt {
-    position: fixed; z-index: 500; pointer-events: none;
-    opacity: 0; transition: opacity .1s;
-    background: var(--ink); color: var(--cream);
-    border-radius: 3px; padding: 10px 14px; max-width: 240px;
-    box-shadow: 0 10px 30px rgba(0,0,0,.3);
-  }
+  /* ── TOOLTIP ────────────────────────── */
+  .tt { position: fixed; z-index: 500; pointer-events: none; opacity: 0; transition: opacity .1s; background: var(--ink); color: var(--cream); border-radius: 3px; padding: 10px 14px; max-width: 240px; box-shadow: 0 10px 30px rgba(0,0,0,.3); }
   .tt.on { opacity: 1; }
   .tt-name  { font-size: 13px; font-weight: 600; line-height: 1.3; margin-bottom: 5px; }
   .tt-date  { font-family: var(--font-mono); font-size: 11px; opacity: .65; margin-bottom: 3px; }
-  .tt-phase { font-family: var(--font-mono); font-size: 10px; opacity: .45; }
-
-  @media (max-width: 700px) {
-    :root { --label-w: 120px; }
-    .camp-name { font-size: 12px; }
-  }
+  .tt-extra { font-family: var(--font-mono); font-size: 10px; opacity: .45; }
 </style>
 </head>
 <body>
@@ -286,19 +115,19 @@
 <div class="tt" id="tt">
   <div class="tt-name"  id="tt-name"></div>
   <div class="tt-date"  id="tt-date"></div>
-  <div class="tt-phase" id="tt-phase"></div>
+  <div class="tt-extra" id="tt-extra"></div>
 </div>
 
 <!-- NAV -->
 <nav>
-  <div class="nav-lbl">Status</div>
+  <span class="nav-lbl">Status</span>
   <div class="nav-section">
-    <span class="nav-item"><span class="ndot" style="background:#6b8c6b"></span>Done</span>
-    <span class="nav-item"><span class="ndot" style="background:var(--muted)"></span>To Do</span>
+    <span class="nav-item"><span class="ndot" style="background:#5a8a5a"></span>Done</span>
+    <span class="nav-item"><span class="ndot" style="background:#9a9280"></span>To Do</span>
   </div>
   <div class="nav-spacer"></div>
   <div class="nav-live">
-    <span class="live-dot" id="ldot"></span>
+    <span class="live-dot" id="ldot" style="background:#9a9280"></span>
     <span id="nav-status">connecting</span>
   </div>
 </nav>
@@ -321,55 +150,45 @@
 </main>
 
 <script>
-// ── CONFIG ────────────────────────────────────────────
 const BASE_ID        = 'appeiBEuOf8zRHX96';
 const MILESTONES_TBL = '[MASTER] Milestones';
-const CAMPAIGNS_TBL  = 'Campaigns';
 
-// The 7 key milestones to display (flexible partial match)
-const KEY_MILESTONES = [
-  'Campaign Kick-Off',
-  'Campaign Kick-off',
-  'First Half Campaign Plan Approved',
-  'Second Half Campaign Plan Approved',
-  'Finalized Campaign Plan Deck',
-  'Finalized Campaign Deck',
-  'Briefing Request in Notion',
-  'Briefing Request',
-  'Finalized Creative Asset Delivered',
-  'Retailer In-Store Launch',
-  'Retailer Launch Campaign',
-  'Retailer Launch',
+// Key milestone name fragments to match (case-insensitive)
+const KEY_FRAGMENTS = [
+  'campaign kick',
+  'first half campaign plan',
+  'second half campaign plan',
+  'finalized campaign plan deck',
+  'finalized campaign deck',
+  'briefing request',
+  'finalized creative asset',
+  'retailer in-store launch',
+  'retailer launch',
 ];
 
-// Short display names to keep boxes compact
-const SHORT_NAMES = {
-  'Campaign Kick-Off':                   'Campaign\nKick-Off',
-  'Campaign Kick-off':                   'Campaign\nKick-Off',
-  'First Half Campaign Plan Approved':   '1st Half Plan\nApproved',
-  'Second Half Campaign Plan Approved':  '2nd Half Plan\nApproved',
-  'Finalized Campaign Plan Deck':        'Finalized\nCampaign Deck',
-  'Finalized Campaign Deck':             'Finalized\nCampaign Deck',
-  'Briefing Request in Notion':          'Briefing\nRequest',
-  'Briefing Request':                    'Briefing\nRequest',
-  'Finalized Creative Asset Delivered':  'Finalized\nCreative Asset',
-  'Retailer In-Store Launch':            'Retailer\nIn-Store Launch',
-  'Retailer Launch Campaign':            'Retailer Launch',
-  'Retailer Launch':                     'Retailer Launch',
-};
-
-function shortName(name) {
-  if (!name) return '';
-  for (const [k, v] of Object.entries(SHORT_NAMES)) {
-    if (name.toLowerCase().includes(k.toLowerCase())) return v;
-  }
-  return name.length > 22 ? name.slice(0, 20) + '…' : name;
+// Short display labels for boxes
+function shortLabel(name) {
+  const n = (name || '').toLowerCase();
+  if (n.includes('kick'))                          return 'Campaign\nKick-Off';
+  if (n.includes('first half'))                    return '1st Half Plan\nApproved';
+  if (n.includes('second half'))                   return '2nd Half Plan\nApproved';
+  if (n.includes('finalized campaign') || n.includes('campaign plan deck') || n.includes('campaign deck')) return 'Finalized\nCampaign Deck';
+  if (n.includes('briefing'))                      return 'Briefing\nRequest';
+  if (n.includes('creative asset'))                return 'Finalized\nCreative Asset';
+  if (n.includes('retailer'))                      return 'Retailer\nLaunch';
+  return name.length > 22 ? name.slice(0,20)+'…' : name;
 }
 
-let TOKEN = '', allMilestones = [], campaignMap = {};
+function isKey(name) {
+  if (!name) return false;
+  const n = name.toLowerCase();
+  return KEY_FRAGMENTS.some(f => n.includes(f));
+}
 
-// ── MODAL ─────────────────────────────────────────────
-const overlay    = document.getElementById('modal-overlay');
+let TOKEN = '', allMilestones = [];
+
+// ── MODAL ──────────────────────────────────────────
+const overlay = document.getElementById('modal-overlay');
 const tokenInput = document.getElementById('token-input');
 const connectBtn = document.getElementById('connect-btn');
 const modalErr   = document.getElementById('modal-err');
@@ -380,19 +199,14 @@ if (saved) { TOKEN = saved; overlay.classList.add('hidden'); init(); }
 connectBtn.addEventListener('click', async () => {
   const t = tokenInput.value.trim();
   if (!t) { modalErr.textContent = 'Please paste your Airtable personal access token.'; return; }
-  connectBtn.disabled = true;
-  connectBtn.textContent = 'Connecting…';
-  modalErr.textContent = '';
+  connectBtn.disabled = true; connectBtn.textContent = 'Connecting…'; modalErr.textContent = '';
   const ok = await testToken(t);
   if (ok) {
-    TOKEN = t;
-    sessionStorage.setItem('at_tok_2026', t);
-    overlay.classList.add('hidden');
-    init();
+    TOKEN = t; sessionStorage.setItem('at_tok_2026', t);
+    overlay.classList.add('hidden'); init();
   } else {
     modalErr.textContent = 'Connection failed — check your token and try again.';
-    connectBtn.disabled = false;
-    connectBtn.textContent = 'Connect →';
+    connectBtn.disabled = false; connectBtn.textContent = 'Connect →';
   }
 });
 tokenInput.addEventListener('keydown', e => { if (e.key === 'Enter') connectBtn.click(); });
@@ -405,65 +219,92 @@ async function testToken(t) {
   } catch { return false; }
 }
 
-// ── FETCH ─────────────────────────────────────────────
-async function fetchTable(tbl) {
-  const recs = [];
-  let offset = null;
+// ── FETCH ──────────────────────────────────────────
+async function fetchTable(tbl, extra = '') {
+  const recs = []; let offset = null;
   do {
-    let url = `https://api.airtable.com/v0/${BASE_ID}/${enc(tbl)}?pageSize=100`;
+    let url = `https://api.airtable.com/v0/${BASE_ID}/${enc(tbl)}?pageSize=100${extra}`;
     if (offset) url += `&offset=${offset}`;
     const r = await fetch(url, { headers: { Authorization: `Bearer ${TOKEN}` } });
     if (!r.ok) throw new Error(`Airtable ${r.status} on "${tbl}"`);
-    const d = await r.json();
-    recs.push(...d.records);
-    offset = d.offset || null;
+    const d = await r.json(); recs.push(...d.records); offset = d.offset || null;
   } while (offset);
   return recs;
 }
 
 function setStatus(s) {
-  const sdot = document.getElementById('sdot');
+  document.getElementById('sdot').className = s;
   const ldot = document.getElementById('ldot');
-  sdot.className = s;
-  ldot.style.background = s === 'live' ? 'var(--c-planning)' : s === 'error' ? 'var(--c-launch)' : 'var(--muted)';
-  ldot.style.animation = s === 'loading' ? 'blink 1s infinite' : '';
+  ldot.style.background = s==='live' ? '#5a8a5a' : s==='error' ? '#bf5030' : '#9a9280';
+  ldot.style.animation  = s==='loading' ? 'blink 1s infinite' : '';
   document.getElementById('nav-status').textContent =
-    s === 'live' ? 'Live · Airtable' : s === 'loading' ? 'Loading…' : s === 'error' ? 'Error' : '…';
+    s==='live' ? 'Live · Airtable' : s==='loading' ? 'Loading…' : s==='error' ? 'Error' : '…';
 }
-
 const enc = s => encodeURIComponent(s);
 
-// ── INIT ──────────────────────────────────────────────
+// ── INIT ───────────────────────────────────────────
 async function init() {
   setStatus('loading');
-  setMsg('Fetching campaigns…');
-
+  setMsg('Fetching milestones…');
   try {
-    // Build Campaign ID → name map
-    campaignMap = {};
-    try {
-      const campRecs = await fetchTable(CAMPAIGNS_TBL);
-      campRecs.forEach(rec => {
-        const f = rec.fields;
-        const name = f['Name'] || f['Campaign Name'] || f['Campaign'] || f['Title'] || Object.values(f)[0] || rec.id;
-        campaignMap[rec.id] = String(name);
-      });
-    } catch(e) {
-      console.warn('Could not load Campaigns table:', e.message);
-    }
-
-    setMsg('Fetching milestones…');
+    // Fetch milestones — ask Airtable to expand linked record display values
+    // by requesting fields that include Campaign. We use two approaches:
+    // 1. Direct fetch (gets IDs for linked fields)
+    // 2. We also look at "Campaign Name" text field if it exists
     const rawRecs = await fetchTable(MILESTONES_TBL);
-    console.log('Sample milestone fields:', rawRecs[0]?.fields);
+    console.log('=== SAMPLE RECORD FIELDS ===', JSON.stringify(rawRecs[0]?.fields, null, 2));
 
-    // Normalise + filter
     allMilestones = rawRecs
       .map(rec => {
         const f = rec.fields;
-        let campName = 'Uncategorized';
-        const cf = f['Campaign'];
-        if (Array.isArray(cf) && cf.length > 0) campName = campaignMap[cf[0]] || cf[0];
-        else if (typeof cf === 'string' && cf)   campName = campaignMap[cf]    || cf;
+
+        // ── Campaign name resolution ──
+        // Airtable linked record fields return array of record IDs.
+        // However, Airtable ALSO populates a parallel read-only text field
+        // if a lookup/formula or the primary field name is available.
+        // We try many possible field names to find a human-readable name.
+        let campName = null;
+
+        // 1. Try plain text fields first (formula/lookup fields that store campaign name)
+        const textCandidates = [
+          'Campaign Name', 'Campaign Title', 'Campaign (Name)', 'Campaign Name (from Campaign)',
+          'Name (from Campaign)', 'Campaign_Name', 'CampaignName',
+        ];
+        for (const k of textCandidates) {
+          if (typeof f[k] === 'string' && f[k].trim()) { campName = f[k].trim(); break; }
+          if (Array.isArray(f[k]) && typeof f[k][0] === 'string') { campName = f[k][0].trim(); break; }
+        }
+
+        // 2. If Campaign field itself returned strings (not IDs), use those
+        if (!campName) {
+          const cf = f['Campaign'];
+          if (Array.isArray(cf)) {
+            // Check if items are strings (names) vs record IDs
+            const nonIds = cf.filter(v => typeof v === 'string' && !v.startsWith('rec'));
+            if (nonIds.length > 0) campName = nonIds[0];
+            else if (cf.length > 0 && typeof cf[0] === 'string' && cf[0].startsWith('rec')) {
+              // It's a record ID — we can't resolve it without fetching Campaigns table
+              // Store it temporarily; we'll try to replace below
+              campName = '__ID__' + cf[0];
+            }
+          } else if (typeof cf === 'string' && cf) {
+            campName = cf.startsWith('rec') ? '__ID__' + cf : cf;
+          }
+        }
+
+        // 3. Fallback: any field containing 'campaign' that has a string value
+        if (!campName) {
+          for (const [k, v] of Object.entries(f)) {
+            if (k.toLowerCase().includes('campaign') && typeof v === 'string' && v && !v.startsWith('rec')) {
+              campName = v; break;
+            }
+            if (k.toLowerCase().includes('campaign') && Array.isArray(v) && typeof v[0] === 'string' && !v[0].startsWith('rec')) {
+              campName = v[0]; break;
+            }
+          }
+        }
+
+        campName = campName || 'Uncategorized';
 
         return {
           id:        rec.id,
@@ -473,12 +314,47 @@ async function init() {
           status:    f['Status']  || 'To Do',
           startDate: bestDate(f['Auto Start Date'], f['Start Date']),
           endDate:   bestDate(f['Auto End Date'],   f['Start Date']),
-          sortOrder: f['Sort Order'] || 999,
         };
       })
       .filter(m => isKey(m.name) && m.startDate);
 
-    console.log('Key milestones loaded:', allMilestones.length);
+    // If we still have unresolved IDs, fetch Campaigns table as last resort
+    const unresolvedIds = [...new Set(
+      allMilestones
+        .filter(m => m.campaign.startsWith('__ID__'))
+        .map(m => m.campaign.replace('__ID__', ''))
+    )];
+
+    if (unresolvedIds.length > 0) {
+      console.log('Resolving campaign IDs via Campaigns table:', unresolvedIds);
+      try {
+        const campRecs = await fetchTable('Campaigns');
+        console.log('=== CAMPAIGNS TABLE SAMPLE ===', JSON.stringify(campRecs[0]?.fields, null, 2));
+        const idMap = {};
+        campRecs.forEach(rec => {
+          const f = rec.fields;
+          // Primary field is the first field — try common names
+          const name = f['Name'] || f['Campaign'] || f['Campaign Name'] || f['Title']
+            || f['name'] || Object.values(f).find(v => typeof v === 'string') || rec.id;
+          idMap[rec.id] = String(name);
+        });
+        allMilestones = allMilestones.map(m => ({
+          ...m,
+          campaign: m.campaign.startsWith('__ID__')
+            ? (idMap[m.campaign.replace('__ID__', '')] || m.campaign.replace('__ID__rec', 'Campaign '))
+            : m.campaign
+        }));
+      } catch(e) {
+        console.warn('Could not fetch Campaigns table:', e.message);
+        // Last-last resort: make IDs readable
+        allMilestones = allMilestones.map(m => ({
+          ...m,
+          campaign: m.campaign.startsWith('__ID__') ? 'Campaign ' + m.campaign.slice(-4) : m.campaign
+        }));
+      }
+    }
+
+    console.log('=== RESOLVED MILESTONES ===', allMilestones.map(m => `${m.campaign} | ${m.name} | ${m.startDate}`));
 
     setStatus('live');
     const camps = new Set(allMilestones.map(m => m.campaign));
@@ -487,44 +363,35 @@ async function init() {
 
     render();
     document.getElementById('main').classList.add('visible');
-
   } catch(e) {
-    setStatus('error');
-    setMsg('⚠ ' + e.message);
-    console.error(e);
+    setStatus('error'); setMsg('⚠ ' + e.message); console.error(e);
   }
-}
-
-function isKey(name) {
-  if (!name) return false;
-  const n = name.toLowerCase();
-  return KEY_MILESTONES.some(k => n.includes(k.toLowerCase()));
 }
 
 document.getElementById('refresh-btn').addEventListener('click', () => { if (TOKEN) init(); });
 
-// ── RENDER ────────────────────────────────────────────
+// ── RENDER ─────────────────────────────────────────
 function render() {
-  const data = allMilestones;
-  const bycamp = groupBy(data, 'campaign');
+  const bycamp = groupBy(allMilestones, 'campaign');
   const campNames = Object.keys(bycamp).sort();
-
   if (!campNames.length) { setMsg('No milestone data found.'); return; }
   document.getElementById('msg').style.display = 'none';
   document.getElementById('scroll-wrap').style.display = '';
 
   // Global date range
   let minTs = Infinity, maxTs = -Infinity;
-  data.forEach(m => {
-    if (m.startDate) { if (m.startDate < minTs) minTs = m.startDate; if (m.startDate > maxTs) maxTs = m.startDate; }
-    if (m.endDate && m.endDate > maxTs) maxTs = m.endDate;
+  allMilestones.forEach(m => {
+    if (m.startDate) { minTs = Math.min(minTs, m.startDate); maxTs = Math.max(maxTs, m.startDate); }
+    if (m.endDate)   maxTs = Math.max(maxTs, m.endDate);
   });
 
-  // Snap to months + padding on each side
   const minD = new Date(minTs); minD.setDate(1);
   const maxD = new Date(maxTs); maxD.setDate(1); maxD.setMonth(maxD.getMonth() + 2);
   const rMin = minD.getTime(), rMax = maxD.getTime(), span = rMax - rMin;
-  const pct = ts => ((ts - rMin) / span * 100).toFixed(4) + '%';
+
+  // Returns 0–100 number (not string) for easier arithmetic
+  const pctNum = ts => (ts - rMin) / span * 100;
+  const pct    = ts => pctNum(ts).toFixed(4) + '%';
 
   // Months
   const months = [];
@@ -534,7 +401,7 @@ function render() {
   const root = document.getElementById('tl-root');
   root.innerHTML = '';
 
-  // ── Month header ──
+  // Month header
   const mhdr = mk('div', 'month-header');
   mhdr.appendChild(mk('div', 'mh-spacer'));
   const mtrack = mk('div', 'mh-track');
@@ -544,167 +411,318 @@ function render() {
     c.textContent = m.toLocaleString('default', { month: 'short' }).toUpperCase();
     mtrack.appendChild(c);
   });
-  mhdr.appendChild(mtrack);
-  root.appendChild(mhdr);
+  mhdr.appendChild(mtrack); root.appendChild(mhdr);
 
   const today = Date.now();
+  const ROW_H = 180;   // px — must match --row-h
+  const MID   = ROW_H / 2;  // y of the horizontal arrow line
 
-  // ── Campaign rows ──
+  // Box geometry constants
+  const BOX_W   = 100;   // approx box width in px (used for collision)
+  const BOX_H   = 36;    // approx box height
+  const TICK_MIN = 18;   // minimum tick length (px)
+
   campNames.forEach(campName => {
     const cms = bycamp[campName].sort((a, b) => a.startDate - b.startDate);
 
-    // Find latest milestone for launch display
-    const launchMs = cms.filter(m => isLaunch(m.name));
-    const launchDate = launchMs.length
-      ? Math.max(...launchMs.map(m => m.startDate))
-      : Math.max(...cms.map(m => m.startDate));
+    // Launch date
+    const launchMs = cms.filter(m => m.name.toLowerCase().includes('retailer') || m.name.toLowerCase().includes('launch'));
+    const launchDate = launchMs.length ? Math.max(...launchMs.map(m => m.startDate)) : Math.max(...cms.map(m => m.startDate));
 
     const group = mk('div', 'camp-group');
     const row   = mk('div', 'camp-row');
 
-    // ── Left label ──
+    // Left label
     const lbl = mk('div', 'camp-lbl');
-    const nm = mk('div', 'camp-name'); nm.textContent = campName; lbl.appendChild(nm);
-    const ld = mk('div', 'camp-launch');
-    ld.textContent = 'Launch ' + fmtDateShort(launchDate);
-    lbl.appendChild(ld);
-    row.appendChild(lbl);
+    const nm = mk('div', 'camp-name'); nm.textContent = campName;
+    const ld = mk('div', 'camp-launch'); ld.textContent = 'Launch ' + fmtDateShort(launchDate);
+    lbl.append(nm, ld); row.appendChild(lbl);
 
-    // ── Timeline canvas ──
-    const tl = mk('div', 'camp-tl');
+    // Timeline div + SVG
+    const tlDiv = mk('div', 'camp-tl');
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('preserveAspectRatio', 'none');
 
     // Grid lines
     months.forEach(m => {
-      const gl = mk('div', 'grid-line'); gl.style.left = pct(m.getTime()); tl.appendChild(gl);
+      const line = svgEl('line');
+      line.setAttribute('x1', pct(m.getTime())); line.setAttribute('x2', pct(m.getTime()));
+      line.setAttribute('y1', '0'); line.setAttribute('y2', '100%');
+      line.setAttribute('stroke', '#cdc8bb'); line.setAttribute('stroke-width', '1');
+      svg.appendChild(line);
     });
 
     // Today line
     if (today >= rMin && today <= rMax) {
-      const tll = mk('div', 'today-line'); tll.style.left = pct(today); tl.appendChild(tll);
-      const tlb = mk('div', 'today-lbl'); tlb.style.left = pct(today); tlb.textContent = 'TODAY'; tl.appendChild(tlb);
+      const tx = pct(today);
+      const tl2 = svgEl('line');
+      tl2.setAttribute('x1', tx); tl2.setAttribute('x2', tx);
+      tl2.setAttribute('y1', '0'); tl2.setAttribute('y2', '100%');
+      tl2.setAttribute('stroke', '#1a1a18'); tl2.setAttribute('stroke-width', '1'); tl2.setAttribute('stroke-opacity', '.2');
+      svg.appendChild(tl2);
+      // "TODAY" text
+      const tt2 = svgEl('text');
+      tt2.setAttribute('x', tx); tt2.setAttribute('y', '12');
+      tt2.setAttribute('text-anchor', 'middle');
+      tt2.setAttribute('font-family', 'DM Mono, monospace');
+      tt2.setAttribute('font-size', '8');
+      tt2.setAttribute('fill', '#1a1a18'); tt2.setAttribute('fill-opacity', '.35');
+      tt2.setAttribute('letter-spacing', '1');
+      tt2.textContent = 'TODAY'; svg.appendChild(tt2);
     }
 
     // Horizontal arrow line
-    tl.appendChild(mk('div', 'tl-line'));
-    tl.appendChild(mk('div', 'tl-arrow'));
+    const arrowX = '98%';
+    const hLine = svgEl('line');
+    hLine.setAttribute('x1', '0'); hLine.setAttribute('x2', arrowX);
+    hLine.setAttribute('y1', MID); hLine.setAttribute('y2', MID);
+    hLine.setAttribute('stroke', '#3a3830'); hLine.setAttribute('stroke-width', '1.5'); hLine.setAttribute('stroke-opacity', '.3');
+    svg.appendChild(hLine);
+    // Arrow head (polygon)
+    const arrowHead = svgEl('polygon');
+    const AX = 99, AY = MID;
+    arrowHead.setAttribute('points', `${AX-12},${AY-6} ${AX},${AY} ${AX-12},${AY+6}`);
+    arrowHead.setAttribute('fill', '#3a3830'); arrowHead.setAttribute('fill-opacity', '.3');
+    svg.appendChild(arrowHead);
 
-    // ── Milestone markers ──
-    // Alternate above/below to reduce label collisions
-    cms.forEach((m, i) => {
-      const above = i % 2 === 0; // even = label above line, odd = label below
+    // ── Collision-aware label placement ──
+    // Assign each milestone a "slot": above (A) or below (B) the line.
+    // Track occupied horizontal ranges per slot to avoid overlap.
+    // We use percentage positions; convert to approximate px for comparison.
+    // We assume the timeline area is ~900px wide (generous estimate).
+    const TL_WIDTH_EST = 1200;
+    const occupiedA = []; // [{left, right}] in px
+    const occupiedB = [];
 
-      const marker = mk('div', 'ms-marker');
-      marker.style.left = pct(m.startDate);
-      marker.style.top  = '0';
+    const placements = cms.map((m, i) => {
+      const xPct  = pctNum(m.startDate);
+      const xPx   = xPct / 100 * TL_WIDTH_EST;
+      const halfW = BOX_W / 2;
+      const left  = xPx - halfW, right = xPx + halfW;
 
-      const isDone = m.status === 'Done';
-      const sn = shortName(m.name);
+      // Check if slot A is free
+      const fitsA = !occupiedA.some(r => left < r.right + 8 && right > r.left - 8);
+      const fitsB = !occupiedB.some(r => left < r.right + 8 && right > r.left - 8);
 
-      if (above) {
-        // Box label on top half
-        const box = mk('div', 'ms-box' + (isDone ? ' done' : ''));
-        box.style.marginTop = '8px';
-        box.textContent = sn;
-        marker.appendChild(box);
-
-        // Tick from box down to line (top half)
-        const tick = mk('div', 'ms-tick');
-        marker.appendChild(tick);
-
-        // Diamond on the line
-        const dia = mk('div', 'ms-diamond' + (isDone ? ' done' : ''));
-        marker.appendChild(dia);
-
-        // Empty spacer for bottom half + date
-        const spacer = mk('div', 'ms-tick');
-        spacer.style.background = 'transparent';
-        marker.appendChild(spacer);
-
-        const date = mk('div', 'ms-date' + (isDone ? ' done' : ''));
-        date.textContent = fmtDateShort(m.startDate);
-        date.style.marginBottom = '8px';
-        marker.appendChild(date);
-
+      let slot;
+      if (fitsA && (i % 2 === 0 || !fitsB)) {
+        slot = 'A'; occupiedA.push({left, right});
+      } else if (fitsB) {
+        slot = 'B'; occupiedB.push({left, right});
       } else {
-        // Date on top half
-        const date = mk('div', 'ms-date' + (isDone ? ' done' : ''));
-        date.textContent = fmtDateShort(m.startDate);
-        date.style.marginTop = '8px';
-        marker.appendChild(date);
-
-        // Tick from date down to line (top half)
-        const tick = mk('div', 'ms-tick');
-        marker.appendChild(tick);
-
-        // Diamond on the line
-        const dia = mk('div', 'ms-diamond' + (isDone ? ' done' : ''));
-        marker.appendChild(dia);
-
-        // Tick below line
-        const tick2 = mk('div', 'ms-tick');
-        marker.appendChild(tick2);
-
-        // Box label on bottom half
-        const box = mk('div', 'ms-box' + (isDone ? ' done' : ''));
-        box.style.marginBottom = '8px';
-        box.textContent = sn;
-        marker.appendChild(box);
+        // Both occupied — push further in the less crowded slot
+        slot = occupiedA.length <= occupiedB.length ? 'A' : 'B';
+        if (slot === 'A') occupiedA.push({left, right});
+        else              occupiedB.push({left, right});
       }
-
-      // Tooltip
-      marker.addEventListener('mouseenter', e => showTT(e, m));
-      marker.addEventListener('mousemove',  e => moveTT(e));
-      marker.addEventListener('mouseleave', hideTT);
-
-      tl.appendChild(marker);
+      return { m, xPct, slot };
     });
 
-    row.appendChild(tl);
+    // Draw milestones
+    placements.forEach(({ m, xPct, slot }) => {
+      const isDone = m.status === 'Done';
+      const xStr   = xPct.toFixed(4) + '%';
+      const label  = shortLabel(m.name);
+      const lines  = label.split('\n');
+      const lineH  = 13;
+      const bH     = lines.length * lineH + 10; // box height
+      const bW     = 100;                         // box width
+      const bHalf  = bW / 2;
+      const inkA   = isDone ? '.3' : '.85';
+
+      const g = svgEl('g');
+      g.style.cursor = 'pointer';
+
+      if (slot === 'A') {
+        // Box above line, tick going down to diamond at MID
+        const boxY     = TICK_MIN;           // top of box
+        const boxBot   = boxY + bH;          // bottom of box
+        const tickTopY = boxBot;             // tick starts at bottom of box
+        const diaY     = MID;               // diamond on the line
+
+        // Tick line
+        const tick = svgEl('line');
+        tick.setAttribute('x1', xStr); tick.setAttribute('x2', xStr);
+        tick.setAttribute('y1', tickTopY); tick.setAttribute('y2', diaY - 4);
+        tick.setAttribute('stroke', '#3a3830'); tick.setAttribute('stroke-width', '1'); tick.setAttribute('stroke-opacity', isDone ? '.25' : '.5');
+        g.appendChild(tick);
+
+        // Diamond
+        const dia = svgEl('rect');
+        dia.setAttribute('x', xPct.toFixed(4) + '%'); // will be shifted via transform
+        dia.setAttribute('y', diaY);
+        dia.setAttribute('width', '8'); dia.setAttribute('height', '8');
+        dia.setAttribute('transform', `translate(-4,-4)`);
+        dia.setAttribute('fill', isDone ? '#8a9a88' : '#3a3830');
+        dia.setAttribute('fill-opacity', inkA);
+        dia.setAttribute('style', `transform-origin: ${xStr} ${diaY}px; transform: rotate(45deg) translate(-4px,-4px)`);
+        // Use a group for the diamond rotation
+        const diaG = svgEl('g');
+        diaG.setAttribute('transform', `translate(${xPct.toFixed(4)}%, ${diaY})`);
+        const diaRect = svgEl('rect');
+        diaRect.setAttribute('x', '-4'); diaRect.setAttribute('y', '-4');
+        diaRect.setAttribute('width', '8'); diaRect.setAttribute('height', '8');
+        diaRect.setAttribute('transform', 'rotate(45)');
+        diaRect.setAttribute('fill', isDone ? '#8a9a88' : '#3a3830');
+        diaRect.setAttribute('fill-opacity', inkA);
+        diaG.appendChild(diaRect); g.appendChild(diaG);
+
+        // Box rect
+        const rect = svgEl('rect');
+        rect.setAttribute('x', xPct.toFixed(4) + '%');
+        rect.setAttribute('y', boxY);
+        rect.setAttribute('width', bW); rect.setAttribute('height', bH);
+        rect.setAttribute('transform', `translate(-${bHalf},0)`);
+        rect.setAttribute('fill', isDone ? '#e0dbd0' : '#f0ebe0');
+        rect.setAttribute('stroke', '#3a3830'); rect.setAttribute('stroke-width', '1');
+        rect.setAttribute('stroke-opacity', isDone ? '.25' : '.6');
+        rect.setAttribute('rx', '2');
+        g.appendChild(rect);
+
+        // Box text
+        lines.forEach((line, li) => {
+          const t = svgEl('text');
+          t.setAttribute('x', xStr);
+          t.setAttribute('y', boxY + 10 + li * lineH);
+          t.setAttribute('text-anchor', 'middle');
+          t.setAttribute('font-family', 'Inter, sans-serif');
+          t.setAttribute('font-size', '10');
+          t.setAttribute('fill', '#3a3830');
+          t.setAttribute('fill-opacity', inkA);
+          t.textContent = line;
+          g.appendChild(t);
+        });
+
+        // Date below line (slot A puts date below)
+        const dateY = MID + 22;
+        const dt = svgEl('text');
+        dt.setAttribute('x', xStr); dt.setAttribute('y', dateY);
+        dt.setAttribute('text-anchor', 'middle');
+        dt.setAttribute('font-family', 'DM Mono, monospace');
+        dt.setAttribute('font-size', '10');
+        dt.setAttribute('font-weight', '500');
+        dt.setAttribute('fill', '#3a3830'); dt.setAttribute('fill-opacity', isDone ? '.3' : '.8');
+        dt.textContent = fmtDateShort(m.startDate);
+        g.appendChild(dt);
+
+      } else {
+        // Slot B: date above line, box below
+        const dateY  = MID - 16;             // date sits above line
+        const boxTop = MID + TICK_MIN;        // box top below line
+        const bH2    = bH;
+
+        // Tick from line down to box
+        const tick = svgEl('line');
+        tick.setAttribute('x1', xStr); tick.setAttribute('x2', xStr);
+        tick.setAttribute('y1', MID + 4); tick.setAttribute('y2', boxTop);
+        tick.setAttribute('stroke', '#3a3830'); tick.setAttribute('stroke-width', '1'); tick.setAttribute('stroke-opacity', isDone ? '.25' : '.5');
+        g.appendChild(tick);
+
+        // Diamond
+        const diaG = svgEl('g');
+        diaG.setAttribute('transform', `translate(${xPct.toFixed(4)}%, ${MID})`);
+        const diaRect = svgEl('rect');
+        diaRect.setAttribute('x', '-4'); diaRect.setAttribute('y', '-4');
+        diaRect.setAttribute('width', '8'); diaRect.setAttribute('height', '8');
+        diaRect.setAttribute('transform', 'rotate(45)');
+        diaRect.setAttribute('fill', isDone ? '#8a9a88' : '#3a3830');
+        diaRect.setAttribute('fill-opacity', inkA);
+        diaG.appendChild(diaRect); g.appendChild(diaG);
+
+        // Date text above line
+        const dt = svgEl('text');
+        dt.setAttribute('x', xStr); dt.setAttribute('y', dateY);
+        dt.setAttribute('text-anchor', 'middle');
+        dt.setAttribute('font-family', 'DM Mono, monospace');
+        dt.setAttribute('font-size', '10');
+        dt.setAttribute('font-weight', '500');
+        dt.setAttribute('fill', '#3a3830'); dt.setAttribute('fill-opacity', isDone ? '.3' : '.8');
+        dt.textContent = fmtDateShort(m.startDate);
+        g.appendChild(dt);
+
+        // Box below line
+        const rect = svgEl('rect');
+        rect.setAttribute('x', xPct.toFixed(4) + '%');
+        rect.setAttribute('y', boxTop);
+        rect.setAttribute('width', bW); rect.setAttribute('height', bH2);
+        rect.setAttribute('transform', `translate(-${bHalf},0)`);
+        rect.setAttribute('fill', isDone ? '#e0dbd0' : '#f0ebe0');
+        rect.setAttribute('stroke', '#3a3830'); rect.setAttribute('stroke-width', '1');
+        rect.setAttribute('stroke-opacity', isDone ? '.25' : '.6');
+        rect.setAttribute('rx', '2');
+        g.appendChild(rect);
+
+        // Box text
+        lines.forEach((line, li) => {
+          const t = svgEl('text');
+          t.setAttribute('x', xStr);
+          t.setAttribute('y', boxTop + 10 + li * lineH);
+          t.setAttribute('text-anchor', 'middle');
+          t.setAttribute('font-family', 'Inter, sans-serif');
+          t.setAttribute('font-size', '10');
+          t.setAttribute('fill', '#3a3830');
+          t.setAttribute('fill-opacity', inkA);
+          t.textContent = line;
+          g.appendChild(t);
+        });
+      }
+
+      // Invisible hit area for tooltip
+      const hit = svgEl('rect');
+      hit.setAttribute('x', xPct.toFixed(4) + '%'); hit.setAttribute('y', '0');
+      hit.setAttribute('width', '60'); hit.setAttribute('height', '100%');
+      hit.setAttribute('transform', `translate(-30,0)`);
+      hit.setAttribute('fill', 'transparent');
+      hit.addEventListener('mouseenter', e => showTT(e, m));
+      hit.addEventListener('mousemove',  e => moveTT(e));
+      hit.addEventListener('mouseleave', hideTT);
+      g.appendChild(hit);
+
+      svg.appendChild(g);
+    });
+
+    tlDiv.appendChild(svg);
+    row.appendChild(tlDiv);
     group.appendChild(row);
     root.appendChild(group);
   });
 }
 
-function isLaunch(name) {
-  if (!name) return false;
-  const n = name.toLowerCase();
-  return n.includes('retailer') || n.includes('launch');
-}
-
-// ── TOOLTIP ───────────────────────────────────────────
+// ── TOOLTIP ────────────────────────────────────────
 const tooltip = document.getElementById('tt');
 function showTT(e, m) {
   document.getElementById('tt-name').textContent  = m.name;
   const s = fmtDate(m.startDate), end = fmtDate(m.endDate);
   document.getElementById('tt-date').textContent  = (end && end !== s) ? `${s} → ${end}` : s;
-  document.getElementById('tt-phase').textContent = m.phase + (m.status ? ' · ' + m.status : '');
+  document.getElementById('tt-extra').textContent = m.phase + (m.status ? ' · ' + m.status : '');
   moveTT(e); tooltip.classList.add('on');
 }
 function moveTT(e) {
-  const tw = tooltip.offsetWidth || 220, th = tooltip.offsetHeight || 90;
-  tooltip.style.left = (e.clientX+14+tw > window.innerWidth  ? e.clientX-tw-14 : e.clientX+14) + 'px';
-  tooltip.style.top  = (e.clientY-10+th > window.innerHeight ? e.clientY-th    : e.clientY-10) + 'px';
+  const tw = tooltip.offsetWidth||220, th = tooltip.offsetHeight||90;
+  tooltip.style.left = (e.clientX+14+tw>window.innerWidth  ? e.clientX-tw-14 : e.clientX+14)+'px';
+  tooltip.style.top  = (e.clientY-10+th>window.innerHeight ? e.clientY-th    : e.clientY-10)+'px';
 }
 function hideTT() { tooltip.classList.remove('on'); }
 
-// ── UTILS ──────────────────────────────────────────────
-function mk(tag, cls) { const e = document.createElement(tag); if (cls) e.className = cls; return e; }
+// ── UTILS ──────────────────────────────────────────
+function mk(tag, cls)  { const e = document.createElement(tag); if (cls) e.className=cls; return e; }
+function svgEl(tag)    { return document.createElementNS('http://www.w3.org/2000/svg', tag); }
 function groupBy(arr, key) {
-  return arr.reduce((a, i) => { const k = i[key]||'Other'; if(!a[k]) a[k]=[]; a[k].push(i); return a; }, {});
+  return arr.reduce((a,i)=>{ const k=i[key]||'Other'; if(!a[k]) a[k]=[]; a[k].push(i); return a; }, {});
 }
-function bestDate(...cands) {
-  for (const d of cands) { if (!d) continue; const ts = Date.parse(d); if (!isNaN(ts)) return ts; }
+function bestDate(...c) {
+  for (const d of c) { if(!d) continue; const ts=Date.parse(d); if(!isNaN(ts)) return ts; }
   return null;
 }
 function fmtDate(ts) {
-  if (!ts) return '—';
-  return new Date(ts).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  if(!ts) return '—';
+  return new Date(ts).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
 }
 function fmtDateShort(ts) {
-  if (!ts) return '—';
-  return new Date(ts).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  if(!ts) return '—';
+  return new Date(ts).toLocaleDateString('en-US',{month:'short',day:'numeric'});
 }
-function setMsg(t) { const m = document.getElementById('msg'); m.style.display = ''; m.textContent = t; }
+function setMsg(t) { const m=document.getElementById('msg'); m.style.display=''; m.textContent=t; }
 </script>
 </body>
 </html>
