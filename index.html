@@ -5,180 +5,346 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>2026 Campaign Calendar</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg:              #0d0f14;
-    --surface:         #161922;
-    --surface2:        #1c2030;
-    --border:          #252a35;
-    --text:            #e8eaf0;
-    --muted:           #5a6070;
-    --accent:          #f0c040;
-    --phase-planning:  #4a9eff;
-    --phase-execution: #b36fff;
-    --phase-launch:    #40d9a0;
-    --phase-review:    #ff7c5c;
-    --phase-done:      #3a4050;
-    --font-mono:       'DM Mono', monospace;
-    --font-display:    'DM Serif Display', serif;
-    --font-ui:         'Syne', sans-serif;
-    --dot-r:           7px;
-    --row-h:           48px;
-  }
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: var(--bg); color: var(--text); font-family: var(--font-ui); min-height: 100vh; }
+    --cream:     #f0ebe0;
+    --cream2:    #e8e2d5;
+    --ink:       #1a1a18;
+    --ink2:      #3a3830;
+    --muted:     #9a9280;
+    --border:    #d4cfc4;
+    --nav-bg:    #1e1e1a;
+    --nav-text:  #e8e4dc;
 
-  /* MODAL */
+    --done:      #6b8c6b;
+    --inprog:    #4a8abf;
+    --waiting:   #c4a44a;
+    --todo:      #bf5a3a;
+
+    --planning:  #7aab7a;
+    --execution: #5a9abf;
+    --launch:    #c45a30;
+
+    --font-serif: 'Playfair Display', serif;
+    --font-mono:  'DM Mono', monospace;
+    --font-ui:    'Inter', sans-serif;
+
+    --row-h: 52px;
+    --label-w: 240px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--cream);
+    color: var(--ink);
+    font-family: var(--font-ui);
+    min-height: 100vh;
+  }
+
+  /* ── MODAL ─────────────────────────── */
   #modal-overlay {
     position: fixed; inset: 0; z-index: 999;
-    background: rgba(0,0,0,.88); backdrop-filter: blur(10px);
+    background: rgba(26,26,24,.82);
+    backdrop-filter: blur(6px);
     display: flex; align-items: center; justify-content: center;
   }
   #modal-overlay.hidden { display: none; }
   .modal-box {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 18px; padding: 48px; width: min(500px, 92vw);
-    position: relative; box-shadow: 0 48px 140px rgba(0,0,0,.7);
+    background: var(--cream);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 48px;
+    width: min(480px, 92vw);
+    box-shadow: 0 32px 80px rgba(0,0,0,.35);
   }
-  .modal-box::after {
-    content: ''; position: absolute; top: 0; left: 48px; right: 48px; height: 1px;
-    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  .modal-eyebrow {
+    font-family: var(--font-mono); font-size: 10px;
+    letter-spacing: .14em; color: var(--muted);
+    text-transform: uppercase; margin-bottom: 12px;
   }
-  .modal-eyebrow { font-family: var(--font-mono); font-size: 10px; letter-spacing: .14em; color: var(--accent); text-transform: uppercase; margin-bottom: 14px; }
-  .modal-title   { font-family: var(--font-display); font-size: 30px; line-height: 1.2; margin-bottom: 10px; }
-  .modal-sub     { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 30px; }
+  .modal-title {
+    font-family: var(--font-serif); font-size: 28px;
+    line-height: 1.2; margin-bottom: 10px; color: var(--ink);
+  }
+  .modal-sub { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 28px; }
   .modal-input {
-    width: 100%; background: var(--bg); border: 1px solid var(--border);
-    border-radius: 8px; padding: 13px 16px; color: var(--text);
+    width: 100%; background: #fff; border: 1px solid var(--border);
+    border-radius: 3px; padding: 12px 14px; color: var(--ink);
     font-family: var(--font-mono); font-size: 13px; outline: none;
-    transition: border-color .2s; margin-bottom: 14px;
+    transition: border-color .2s; margin-bottom: 12px;
   }
-  .modal-input:focus { border-color: var(--accent); }
+  .modal-input:focus { border-color: var(--ink); }
   .modal-input::placeholder { color: var(--muted); }
   .modal-btn {
-    width: 100%; background: var(--accent); color: #000; border: none;
-    border-radius: 8px; padding: 14px; font-family: var(--font-ui);
-    font-weight: 700; font-size: 14px; letter-spacing: .04em;
-    cursor: pointer; transition: opacity .15s, transform .1s;
+    width: 100%; background: var(--ink); color: var(--cream); border: none;
+    border-radius: 3px; padding: 13px; font-family: var(--font-ui);
+    font-weight: 600; font-size: 13px; letter-spacing: .04em;
+    cursor: pointer; transition: opacity .15s;
   }
-  .modal-btn:hover { opacity: .85; }
-  .modal-btn:active { transform: scale(.98); }
+  .modal-btn:hover { opacity: .82; }
   .modal-btn:disabled { opacity: .4; cursor: default; }
-  .modal-err { font-size: 12px; color: var(--phase-review); margin-top: 10px; min-height: 16px; font-family: var(--font-mono); }
+  .modal-err { font-size: 12px; color: var(--todo); margin-top: 10px; min-height: 16px; font-family: var(--font-mono); }
 
-  /* HEADER */
-  header { padding: 32px 48px 20px; display: flex; align-items: flex-end; justify-content: space-between; border-bottom: 1px solid var(--border); gap: 24px; flex-wrap: wrap; }
-  .h-title { font-family: var(--font-display); font-size: 34px; letter-spacing: -.02em; line-height: 1; }
-  .h-title em { color: var(--accent); }
-  .h-sub { margin-top: 6px; font-family: var(--font-mono); font-size: 11px; color: var(--muted); letter-spacing: .06em; }
-  .h-legend { display: flex; gap: 18px; flex-wrap: wrap; align-items: center; }
-  .leg { display: flex; align-items: center; gap: 7px; font-family: var(--font-mono); font-size: 11px; color: var(--muted); }
-  .leg-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  /* ── TOP NAV ───────────────────────── */
+  nav {
+    background: var(--nav-bg);
+    color: var(--nav-text);
+    display: flex; align-items: center;
+    padding: 0 32px;
+    height: 44px;
+    gap: 28px;
+    flex-wrap: wrap;
+  }
+  .nav-section { display: flex; align-items: center; gap: 16px; }
+  .nav-label {
+    font-family: var(--font-mono); font-size: 10px;
+    letter-spacing: .12em; text-transform: uppercase;
+    color: rgba(232,228,220,.45); margin-right: 4px;
+  }
+  .nav-item { display: flex; align-items: center; gap: 6px; font-family: var(--font-mono); font-size: 11px; color: var(--nav-text); }
+  .nav-dot  { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .nav-dash { width: 16px; height: 3px; border-radius: 2px; flex-shrink: 0; }
+  .nav-spacer { flex: 1; }
+  .nav-live {
+    display: flex; align-items: center; gap: 6px;
+    font-family: var(--font-mono); font-size: 10px;
+    color: rgba(232,228,220,.5); letter-spacing: .06em;
+  }
+  .live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--planning); }
 
-  /* CONTROLS */
-  .controls { padding: 14px 48px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; border-bottom: 1px solid var(--border); }
-  .ctl-label { font-family: var(--font-mono); font-size: 10px; color: var(--muted); letter-spacing: .1em; text-transform: uppercase; margin-right: 2px; }
-  .filter-btn { background: transparent; border: 1px solid var(--border); border-radius: 6px; color: var(--muted); font-family: var(--font-mono); font-size: 11px; padding: 5px 12px; cursor: pointer; transition: all .15s; letter-spacing: .03em; }
-  .filter-btn:hover  { border-color: var(--accent); color: var(--text); }
-  .filter-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(240,192,64,.07); }
+  /* ── PAGE HEADING ──────────────────── */
+  .page-head {
+    padding: 36px 32px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: baseline; gap: 18px; flex-wrap: wrap;
+  }
+  .page-head h1 {
+    font-family: var(--font-serif); font-size: 38px;
+    font-weight: 800; color: var(--ink); line-height: 1;
+  }
+  .page-meta {
+    font-family: var(--font-mono); font-size: 11px;
+    color: var(--muted); letter-spacing: .08em; text-transform: uppercase;
+  }
+
+  /* ── CONTROLS ──────────────────────── */
+  .controls {
+    padding: 10px 32px; display: flex; gap: 8px;
+    align-items: center; flex-wrap: wrap;
+    border-bottom: 1px solid var(--border);
+    background: var(--cream2);
+  }
+  .ctl-label { font-family: var(--font-mono); font-size: 10px; color: var(--muted); letter-spacing: .1em; text-transform: uppercase; }
+  .filter-btn {
+    background: transparent; border: 1px solid var(--border);
+    border-radius: 2px; color: var(--muted); font-family: var(--font-mono);
+    font-size: 11px; padding: 4px 11px; cursor: pointer; transition: all .15s;
+  }
+  .filter-btn:hover  { border-color: var(--ink2); color: var(--ink2); }
+  .filter-btn.active { border-color: var(--ink); color: var(--ink); background: rgba(26,26,24,.06); }
   .spacer { flex: 1; }
-  #refresh-btn { display: flex; align-items: center; gap: 7px; background: transparent; border: 1px solid var(--border); border-radius: 6px; color: var(--muted); font-family: var(--font-mono); font-size: 11px; padding: 5px 12px; cursor: pointer; transition: all .15s; }
-  #refresh-btn:hover { border-color: var(--text); color: var(--text); }
-  #status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--muted); transition: background .3s; flex-shrink: 0; }
-  #status-dot.live    { background: var(--phase-launch); box-shadow: 0 0 6px var(--phase-launch); }
-  #status-dot.loading { background: var(--accent); animation: blink 1s infinite; }
-  #status-dot.error   { background: var(--phase-review); }
-  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.25} }
+  #refresh-btn {
+    display: flex; align-items: center; gap: 6px;
+    background: transparent; border: 1px solid var(--border);
+    border-radius: 2px; color: var(--muted); font-family: var(--font-mono);
+    font-size: 11px; padding: 4px 11px; cursor: pointer; transition: all .15s;
+  }
+  #refresh-btn:hover { border-color: var(--ink2); color: var(--ink2); }
+  #sdot { width: 6px; height: 6px; border-radius: 50%; background: var(--muted); transition: background .3s; }
+  #sdot.live    { background: var(--planning); }
+  #sdot.loading { background: var(--waiting); animation: blink 1s infinite; }
+  #sdot.error   { background: var(--todo); }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
 
-  /* MAIN */
-  main { padding: 0 0 100px; opacity: 0; transition: opacity .4s; }
+  /* ── MAIN CONTENT ──────────────────── */
+  main { opacity: 0; transition: opacity .35s; }
   main.visible { opacity: 1; }
-  #msg { padding: 80px 48px; text-align: center; font-family: var(--font-mono); font-size: 13px; color: var(--muted); letter-spacing: .05em; }
-  .scroll-wrapper { overflow-x: auto; }
-  .timeline-root  { min-width: 880px; }
+  #msg { padding: 80px 32px; text-align: center; font-family: var(--font-mono); font-size: 13px; color: var(--muted); }
+  .scroll-wrap { overflow-x: auto; }
+  .tl-root { min-width: 820px; }
 
-  /* Month header */
-  .month-header { position: sticky; top: 0; z-index: 10; background: var(--bg); border-bottom: 1px solid var(--border); display: flex; height: 34px; }
-  .mh-spacer { flex-shrink: 0; width: 200px; border-right: 1px solid var(--border); }
+  /* Month header row */
+  .month-header {
+    position: sticky; top: 0; z-index: 10;
+    background: var(--cream2);
+    border-bottom: 2px solid var(--border);
+    display: flex; height: 30px;
+  }
+  .mh-spacer { flex-shrink: 0; width: var(--label-w); border-right: 1px solid var(--border); }
   .mh-track  { flex: 1; position: relative; overflow: hidden; }
-  .mh-cell { position: absolute; top: 0; bottom: 0; display: flex; align-items: center; padding-left: 10px; font-family: var(--font-mono); font-size: 10px; color: var(--muted); letter-spacing: .07em; text-transform: uppercase; border-left: 1px solid var(--border); white-space: nowrap; }
+  .mh-cell {
+    position: absolute; top: 0; bottom: 0;
+    display: flex; align-items: center; padding-left: 10px;
+    font-family: var(--font-mono); font-size: 10px; color: var(--muted);
+    letter-spacing: .09em; text-transform: uppercase;
+    border-left: 1px solid var(--border);
+    white-space: nowrap;
+  }
 
   /* Campaign rows */
-  .camp-group { border-bottom: 1px solid var(--border); }
-  .camp-row   { display: flex; align-items: stretch; }
-  .camp-lbl { flex-shrink: 0; width: 200px; padding: 12px 18px; border-right: 1px solid var(--border); display: flex; flex-direction: column; justify-content: center; gap: 4px; }
-  .camp-name { font-size: 13px; font-weight: 700; line-height: 1.25; }
-  .camp-meta { font-family: var(--font-mono); font-size: 10px; color: var(--muted); }
-  .camp-tl   { flex: 1; position: relative; }
+  .camp-group {
+    border-bottom: 1px solid var(--border);
+    background: var(--cream);
+    transition: background .15s;
+  }
+  .camp-group:hover { background: rgba(255,255,255,.55); }
+
+  .camp-row { display: flex; align-items: stretch; }
+
+  .camp-lbl {
+    flex-shrink: 0; width: var(--label-w);
+    padding: 16px 20px;
+    border-right: 1px solid var(--border);
+    display: flex; flex-direction: column; justify-content: center; gap: 6px;
+  }
+  .camp-name {
+    font-family: var(--font-serif); font-size: 16px; font-weight: 700;
+    color: var(--ink); line-height: 1.2;
+  }
+  .camp-status {
+    display: flex; align-items: center; gap: 5px;
+    font-family: var(--font-mono); font-size: 10px;
+    letter-spacing: .07em; text-transform: uppercase;
+  }
+  .camp-status .dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+  .camp-dates { font-family: var(--font-mono); font-size: 10px; color: var(--muted); }
+
+  /* Timeline area */
+  .camp-tl { flex: 1; position: relative; }
+
+  /* Key dates panel */
+  .camp-key { flex-shrink: 0; width: 120px; border-left: 1px solid var(--border); padding: 10px 14px; display: flex; flex-direction: column; gap: 6px; }
+  .key-label { font-family: var(--font-mono); font-size: 9px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 2px; }
+  .key-date  { font-family: var(--font-mono); font-size: 10px; color: var(--ink2); }
 
   /* Phase lanes */
-  .phase-lane { position: relative; min-height: var(--row-h); border-bottom: 1px solid rgba(255,255,255,.025); }
+  .phase-lane {
+    position: relative; min-height: var(--row-h);
+    border-bottom: 1px solid rgba(26,26,24,.05);
+  }
   .phase-lane:last-child { border-bottom: none; }
 
-  /* Grid lines */
+  /* Grid */
   .grid-line  { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--border); pointer-events: none; }
-  .today-line { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--accent); opacity: .4; pointer-events: none; z-index: 2; }
-  .today-lbl  { position: absolute; top: 3px; transform: translateX(-50%); font-family: var(--font-mono); font-size: 9px; color: var(--accent); letter-spacing: .07em; white-space: nowrap; pointer-events: none; z-index: 2; }
+  .today-line { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--ink); opacity: .3; pointer-events: none; z-index: 2; }
+  .today-lbl  {
+    position: absolute; top: 3px; transform: translateX(-50%);
+    font-family: var(--font-mono); font-size: 8px; color: var(--ink);
+    opacity: .45; letter-spacing: .07em; white-space: nowrap; pointer-events: none; z-index: 2;
+  }
 
-  /* Milestone bar */
-  .ms-bar { position: absolute; top: 50%; transform: translateY(-50%); height: 5px; border-radius: 3px; opacity: .22; pointer-events: none; }
+  /* Timeline bar (background) */
+  .tl-bg {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    height: 3px; border-radius: 2px;
+    background: var(--border); opacity: .7;
+    pointer-events: none;
+  }
+
+  /* Milestone bar (duration) */
+  .ms-bar {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    height: 4px; border-radius: 2px; opacity: .35; pointer-events: none;
+  }
 
   /* Milestone dot */
-  .ms-dot { position: absolute; top: 50%; transform: translate(-50%, -50%); width: calc(var(--dot-r) * 2); height: calc(var(--dot-r) * 2); border-radius: 50%; cursor: pointer; border: 2px solid var(--bg); transition: transform .14s, box-shadow .14s; z-index: 3; }
-  .ms-dot:hover { transform: translate(-50%, -50%) scale(1.55); z-index: 20; }
-  .ms-dot.done  { opacity: .35; }
+  .ms-dot {
+    position: absolute; top: 50%;
+    transform: translate(-50%, -50%);
+    width: 14px; height: 14px; border-radius: 50%;
+    cursor: pointer; border: 2px solid var(--cream);
+    box-shadow: 0 1px 4px rgba(0,0,0,.18);
+    transition: transform .12s, box-shadow .12s; z-index: 3;
+  }
+  .ms-dot:hover { transform: translate(-50%, -50%) scale(1.45); box-shadow: 0 2px 8px rgba(0,0,0,.25); z-index: 20; }
+  .ms-dot.done  { opacity: .4; }
+
+  /* Milestone label below dot */
+  .ms-label {
+    position: absolute;
+    top: calc(50% + 12px);
+    transform: translateX(-50%);
+    font-family: var(--font-mono); font-size: 9px;
+    color: var(--muted); white-space: nowrap;
+    pointer-events: none; letter-spacing: .03em;
+    max-width: 100px; overflow: hidden; text-overflow: ellipsis;
+    z-index: 3;
+  }
 
   /* Tooltip */
-  .tt { position: fixed; z-index: 200; pointer-events: none; opacity: 0; transition: opacity .12s; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; max-width: 280px; box-shadow: 0 20px 60px rgba(0,0,0,.7); }
+  .tt {
+    position: fixed; z-index: 500; pointer-events: none;
+    opacity: 0; transition: opacity .1s;
+    background: var(--ink); color: var(--cream);
+    border-radius: 4px; padding: 11px 15px; max-width: 260px;
+    box-shadow: 0 12px 40px rgba(0,0,0,.3);
+  }
   .tt.on { opacity: 1; }
-  .tt-phase { font-family: var(--font-mono); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 4px; }
-  .tt-name  { font-size: 13px; font-weight: 700; line-height: 1.35; margin-bottom: 6px; }
-  .tt-dates { font-family: var(--font-mono); font-size: 11px; color: var(--muted); margin-bottom: 5px; }
-  .tt-row   { display: flex; align-items: center; gap: 5px; font-family: var(--font-mono); font-size: 10px; }
-  .tt-row .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+  .tt-phase { font-family: var(--font-mono); font-size: 9px; letter-spacing: .1em; text-transform: uppercase; opacity: .6; margin-bottom: 4px; }
+  .tt-name  { font-size: 13px; font-weight: 600; line-height: 1.3; margin-bottom: 5px; }
+  .tt-dates { font-family: var(--font-mono); font-size: 11px; opacity: .65; margin-bottom: 4px; }
+  .tt-status-row { display: flex; align-items: center; gap: 5px; font-family: var(--font-mono); font-size: 10px; opacity: .8; }
+  .tt-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
 
   @media (max-width: 700px) {
-    header, .controls { padding-left: 16px; padding-right: 16px; }
-    .camp-lbl { width: 130px; }
-    .mh-spacer { width: 130px; }
+    .page-head h1 { font-size: 26px; }
+    :root { --label-w: 140px; }
+    .camp-key { display: none; }
   }
 </style>
 </head>
 <body>
 
+<!-- MODAL -->
 <div id="modal-overlay">
   <div class="modal-box">
-    <div class="modal-eyebrow">2026 · Live Campaign Calendar</div>
-    <h2 class="modal-title">Enter your<br><em>Airtable token</em></h2>
-    <p class="modal-sub">Stored only in this browser session — never sent anywhere except directly to the Airtable API.</p>
+    <div class="modal-eyebrow">2026 · Campaign Calendar</div>
+    <h2 class="modal-title">Connect to Airtable</h2>
+    <p class="modal-sub">Enter your personal access token. It stays in this browser session only — never stored or shared.</p>
     <input class="modal-input" id="token-input" type="password" placeholder="pat2Cx…" autocomplete="off" spellcheck="false">
-    <button class="modal-btn" id="connect-btn">Connect to Airtable →</button>
+    <button class="modal-btn" id="connect-btn">Connect →</button>
     <div class="modal-err" id="modal-err"></div>
   </div>
 </div>
 
+<!-- TOOLTIP -->
 <div class="tt" id="tt">
-  <div class="tt-phase" id="tt-phase"></div>
-  <div class="tt-name"  id="tt-name"></div>
-  <div class="tt-dates" id="tt-dates"></div>
-  <div class="tt-row"   id="tt-status"></div>
+  <div class="tt-phase"      id="tt-phase"></div>
+  <div class="tt-name"       id="tt-name"></div>
+  <div class="tt-dates"      id="tt-dates"></div>
+  <div class="tt-status-row" id="tt-status"></div>
 </div>
 
-<header>
-  <div>
-    <div class="h-title">2026 <em>Campaign</em> Calendar</div>
-    <div class="h-sub" id="h-sub">— connecting —</div>
+<!-- TOP NAV -->
+<nav>
+  <div class="nav-section">
+    <span class="nav-label">Status</span>
+    <span class="nav-item"><span class="nav-dot" style="background:var(--done)"></span> Done</span>
+    <span class="nav-item"><span class="nav-dot" style="background:var(--inprog)"></span> In Progress</span>
+    <span class="nav-item"><span class="nav-dot" style="background:var(--waiting)"></span> Waiting</span>
+    <span class="nav-item"><span class="nav-dot" style="background:var(--todo)"></span> To Do</span>
   </div>
-  <div class="h-legend">
-    <div class="leg"><span class="leg-dot" style="background:var(--phase-planning)"></span> Planning</div>
-    <div class="leg"><span class="leg-dot" style="background:var(--phase-execution)"></span> Execution</div>
-    <div class="leg"><span class="leg-dot" style="background:var(--phase-launch)"></span> Launch</div>
-    <div class="leg"><span class="leg-dot" style="background:var(--phase-review)"></span> Review &amp; Report</div>
-    <div class="leg"><span class="leg-dot" style="background:var(--phase-done);opacity:.5"></span> Done</div>
+  <div class="nav-spacer"></div>
+  <div class="nav-section">
+    <span class="nav-item"><span class="nav-dash" style="background:var(--planning)"></span> Planning</span>
+    <span class="nav-item"><span class="nav-dash" style="background:var(--execution)"></span> Execution</span>
+    <span class="nav-item"><span class="nav-dash" style="background:var(--launch)"></span> Launch</span>
   </div>
-</header>
+  <div class="nav-live">
+    <span class="live-dot" id="sdot"></span>
+    <span id="nav-status">connecting</span>
+  </div>
+</nav>
 
+<!-- PAGE HEADING -->
+<div class="page-head">
+  <h1>Active Campaigns</h1>
+  <span class="page-meta" id="page-meta">loading…</span>
+</div>
+
+<!-- CONTROLS -->
 <div class="controls">
   <span class="ctl-label">Phase</span>
   <button class="filter-btn active" data-filter="all">All</button>
@@ -187,33 +353,60 @@
   <button class="filter-btn" data-filter="Launch">Launch</button>
   <button class="filter-btn" data-filter="Review & Report">Review &amp; Report</button>
   <div class="spacer"></div>
-  <button id="refresh-btn"><span id="status-dot"></span> Refresh</button>
+  <button id="refresh-btn"><span id="sdot2" style="width:6px;height:6px;border-radius:50%;background:var(--muted);display:inline-block"></span> Refresh</button>
 </div>
 
+<!-- MAIN -->
 <main id="main">
   <div id="msg">Connecting to Airtable…</div>
-  <div class="scroll-wrapper" id="scroll-wrapper" style="display:none">
-    <div class="timeline-root" id="timeline-root"></div>
+  <div class="scroll-wrap" id="scroll-wrap" style="display:none">
+    <div class="tl-root" id="tl-root"></div>
   </div>
 </main>
 
 <script>
+// ── CONFIG ────────────────────────────────────────────
 const BASE_ID        = 'appeiBEuOf8zRHX96';
 const MILESTONES_TBL = '[MASTER] Milestones';
 const CAMPAIGNS_TBL  = 'Campaigns';
 
+// The 7 key milestones to display (partial match, case-insensitive)
+const KEY_MILESTONES = [
+  'Campaign Kick-Off',
+  'Campaign Kick-off',
+  'First Half Campaign Plan Approved',
+  'Second Half Campaign Plan Approved',
+  'Finalized Campaign Plan Deck',
+  'Finalized Campaign Deck',
+  'Briefing Request in Notion',
+  'Briefing Request',
+  'Finalized Creative Asset Delivered',
+  'Retailer In-Store Launch',
+  'Retailer Launch',
+];
+
+// Status → color
+const STATUS_COLOR = {
+  'Done':        'var(--done)',
+  'In Progress': 'var(--inprog)',
+  'Waiting':     'var(--waiting)',
+  'To Do':       'var(--todo)',
+};
+
+// Phase → color
 const PHASE_COLOR = {
-  'Planning':        'var(--phase-planning)',
-  'Execution':       'var(--phase-execution)',
-  'Launch':          'var(--phase-launch)',
-  'Review & Report': 'var(--phase-review)',
+  'Planning':        'var(--planning)',
+  'Execution':       'var(--execution)',
+  'Launch':          'var(--launch)',
+  'Review & Report': 'var(--todo)',
 };
 const PHASE_ORDER = ['Planning','Execution','Launch','Review & Report'];
 const phaseColor = p => PHASE_COLOR[p] || 'var(--muted)';
+const statusColor = s => STATUS_COLOR[s] || 'var(--muted)';
 
-let TOKEN = '', milestones = [], campaignMap = {}, activeFilter = 'all';
+let TOKEN = '', allMilestones = [], campaignMap = {}, activeFilter = 'all';
 
-// ── MODAL ────────────────────────────────────────
+// ── MODAL ────────────────────────────────────────────
 const overlay    = document.getElementById('modal-overlay');
 const tokenInput = document.getElementById('token-input');
 const connectBtn = document.getElementById('connect-btn');
@@ -235,9 +428,9 @@ connectBtn.addEventListener('click', async () => {
     overlay.classList.add('hidden');
     init();
   } else {
-    modalErr.textContent = 'Connection failed. Check your token and try again.';
+    modalErr.textContent = 'Connection failed — check your token and try again.';
     connectBtn.disabled = false;
-    connectBtn.textContent = 'Connect to Airtable →';
+    connectBtn.textContent = 'Connect →';
   }
 });
 tokenInput.addEventListener('keydown', e => { if (e.key === 'Enter') connectBtn.click(); });
@@ -252,7 +445,7 @@ async function testToken(t) {
   } catch { return false; }
 }
 
-// ── FETCH ────────────────────────────────────────
+// ── FETCH ────────────────────────────────────────────
 async function fetchTable(tbl) {
   const recs = [];
   let offset = null;
@@ -268,67 +461,81 @@ async function fetchTable(tbl) {
   return recs;
 }
 
-const setStatus = s => { document.getElementById('status-dot').className = s; };
+function setStatus(s) {
+  document.getElementById('sdot').className   = '';
+  document.getElementById('sdot').style.background =
+    s === 'live'    ? 'var(--planning)' :
+    s === 'loading' ? 'var(--waiting)'  :
+    s === 'error'   ? 'var(--todo)'     : 'var(--muted)';
+  document.getElementById('sdot').style.animation = s === 'loading' ? 'blink 1s infinite' : '';
+  document.getElementById('nav-status').textContent =
+    s === 'live' ? 'Live · Airtable' : s === 'loading' ? 'Loading…' : s === 'error' ? 'Error' : '…';
+}
+
 const enc = s => encodeURIComponent(s);
 
-// ── INIT ─────────────────────────────────────────
+// ── INIT ─────────────────────────────────────────────
 async function init() {
   setStatus('loading');
   setMsg('Fetching campaigns…');
 
   try {
-    // Step 1: Build Campaign record ID → name map
+    // Build Campaign ID → name map
     campaignMap = {};
     try {
       const campRecs = await fetchTable(CAMPAIGNS_TBL);
       campRecs.forEach(rec => {
         const f = rec.fields;
-        // Try common primary field names
         const name = f['Name'] || f['Campaign Name'] || f['Campaign'] || f['Title'] || Object.values(f)[0] || rec.id;
         campaignMap[rec.id] = String(name);
       });
-      console.log(`Loaded ${Object.keys(campaignMap).length} campaigns:`, campaignMap);
+      console.log('Campaigns loaded:', campaignMap);
     } catch(e) {
-      console.warn('Could not load Campaigns table:', e.message,
-        '— will use raw IDs as campaign names');
+      console.warn('Could not load Campaigns table:', e.message);
     }
 
-    // Step 2: Fetch all milestones
+    // Fetch milestones
     setMsg('Fetching milestones…');
     const rawRecs = await fetchTable(MILESTONES_TBL);
-    console.log('Sample record fields:', rawRecs[0]?.fields);
+    console.log('Sample milestone fields:', rawRecs[0]?.fields);
 
-    // Step 3: Normalise
-    milestones = rawRecs.map(rec => {
-      const f = rec.fields;
+    // Normalise + filter to KEY_MILESTONES
+    allMilestones = rawRecs
+      .map(rec => {
+        const f = rec.fields;
+        const mName = f['Milestones'] || f['Name'] || '';
 
-      // Campaign: linked record field → array of record IDs
-      let campName = 'Uncategorized';
-      const cf = f['Campaign'];
-      if (Array.isArray(cf) && cf.length > 0) {
-        campName = campaignMap[cf[0]] || cf[0];
-      } else if (typeof cf === 'string' && cf) {
-        campName = campaignMap[cf] || cf;
-      }
+        // Resolve campaign from linked record
+        let campName = 'Uncategorized';
+        const cf = f['Campaign'];
+        if (Array.isArray(cf) && cf.length > 0) {
+          campName = campaignMap[cf[0]] || cf[0];
+        } else if (typeof cf === 'string' && cf) {
+          campName = campaignMap[cf] || cf;
+        }
 
-      return {
-        id:        rec.id,
-        name:      f['Milestones'] || f['Name'] || '(unnamed)',
-        campaign:  campName,
-        phase:     f['Phase']     || 'Other',
-        status:    f['Status']    || '',
-        channel:   f['Channel']   || '',
-        duration:  f['Duration (Days)'] || null,
-        startDate: bestDate(f['Auto Start Date'], f['Start Date']),
-        endDate:   bestDate(f['Auto End Date'],   f['Start Date']),
-        sortOrder: f['Sort Order'] || 999,
-      };
-    });
+        return {
+          id:        rec.id,
+          name:      mName,
+          campaign:  campName,
+          phase:     f['Phase']    || 'Other',
+          status:    f['Status']   || 'To Do',
+          channel:   f['Channel']  || '',
+          duration:  f['Duration (Days)'] || null,
+          startDate: bestDate(f['Auto Start Date'], f['Start Date']),
+          endDate:   bestDate(f['Auto End Date'],   f['Start Date']),
+          sortOrder: f['Sort Order'] || 999,
+        };
+      })
+      // Keep only the 7 key milestones (flexible name matching)
+      .filter(m => isKeyMilestone(m.name));
+
+    console.log(`Filtered to ${allMilestones.length} key milestones`);
 
     setStatus('live');
-    const camps = new Set(milestones.map(m => m.campaign));
-    document.getElementById('h-sub').textContent =
-      `${milestones.length} milestones · ${camps.size} campaigns · live`;
+    const camps = new Set(allMilestones.map(m => m.campaign));
+    document.getElementById('page-meta').textContent =
+      `${camps.size} Campaign${camps.size !== 1 ? 's' : ''} · Q1–Q3 2026`;
 
     render();
     document.getElementById('main').classList.add('visible');
@@ -340,9 +547,15 @@ async function init() {
   }
 }
 
+function isKeyMilestone(name) {
+  if (!name) return false;
+  const n = name.toLowerCase();
+  return KEY_MILESTONES.some(k => n.includes(k.toLowerCase()));
+}
+
 document.getElementById('refresh-btn').addEventListener('click', () => { if (TOKEN) init(); });
 
-// ── FILTER ───────────────────────────────────────
+// ── FILTER ───────────────────────────────────────────
 document.querySelectorAll('.filter-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
@@ -352,47 +565,52 @@ document.querySelectorAll('.filter-btn').forEach(btn => {
   });
 });
 
-// ── RENDER ───────────────────────────────────────
+// ── RENDER ───────────────────────────────────────────
 function render() {
-  const data = activeFilter === 'all' ? milestones : milestones.filter(m => m.phase === activeFilter);
+  const data = activeFilter === 'all'
+    ? allMilestones
+    : allMilestones.filter(m => m.phase === activeFilter);
+
   const bycamp = groupBy(data, 'campaign');
   const campNames = Object.keys(bycamp).sort();
 
   if (!campNames.length) {
     setMsg('No records match this filter.');
-    document.getElementById('scroll-wrapper').style.display = 'none';
+    document.getElementById('scroll-wrap').style.display = 'none';
     return;
   }
   document.getElementById('msg').style.display = 'none';
-  document.getElementById('scroll-wrapper').style.display = '';
+  document.getElementById('scroll-wrap').style.display = '';
 
-  // Date range
+  // Date range across all data
   let minTs = Infinity, maxTs = -Infinity;
   data.forEach(m => {
     if (m.startDate) { if (m.startDate < minTs) minTs = m.startDate; if (m.startDate > maxTs) maxTs = m.startDate; }
-    if (m.endDate)   { if (m.endDate   > maxTs) maxTs = m.endDate; }
+    if (m.endDate   && m.endDate > maxTs) maxTs = m.endDate;
   });
 
+  // Snap to month boundaries + padding
   const minD = new Date(minTs); minD.setDate(1);
   const maxD = new Date(maxTs); maxD.setDate(1); maxD.setMonth(maxD.getMonth() + 2);
   const rMin = minD.getTime(), rMax = maxD.getTime(), span = rMax - rMin;
   const pct = ts => ((ts - rMin) / span * 100).toFixed(4) + '%';
 
+  // Month list
   const months = [];
   const mc = new Date(rMin);
   while (mc.getTime() < rMax) { months.push(new Date(mc)); mc.setMonth(mc.getMonth() + 1); }
 
-  const root = document.getElementById('timeline-root');
+  const root = document.getElementById('tl-root');
   root.innerHTML = '';
 
-  // Month header
+  // ── Month header ──
   const mhdr = mk('div', 'month-header');
   mhdr.appendChild(mk('div', 'mh-spacer'));
   const mtrack = mk('div', 'mh-track');
   months.forEach(m => {
     const c = mk('div', 'mh-cell');
     c.style.left = pct(m.getTime());
-    c.textContent = m.toLocaleString('default', { month: 'short' }) + ' \'' + String(m.getFullYear()).slice(2);
+    c.textContent = m.toLocaleString('default', { month: 'short' }).toUpperCase();
     mtrack.appendChild(c);
   });
   mhdr.appendChild(mtrack);
@@ -400,87 +618,160 @@ function render() {
 
   const today = Date.now();
 
-  // Campaign rows
+  // ── Campaign rows ──
   campNames.forEach(campName => {
     const cms = bycamp[campName];
-    const done = cms.filter(m => m.status === 'Done').length;
+
+    // Campaign status summary
+    const statusCounts = {};
+    cms.forEach(m => { statusCounts[m.status] = (statusCounts[m.status] || 0) + 1; });
+    const campStatus = Object.keys(statusCounts).sort((a, b) => statusCounts[b] - statusCounts[a])[0] || 'To Do';
+
+    // Launch date = latest endDate among 'Launch' phase milestones, or latest start
+    const launchMs = cms.filter(m => m.phase === 'Launch');
+    const launchDate = launchMs.length
+      ? Math.max(...launchMs.map(m => m.endDate || m.startDate).filter(Boolean))
+      : null;
+
+    // Key dates for sidebar: up to 3 notable milestone dates
+    const keyDates = cms
+      .filter(m => m.startDate)
+      .sort((a, b) => a.startDate - b.startDate)
+      .slice(0, 3);
+
+    // Group by phase
     const byPhase = groupBy(cms, 'phase');
     const phases = [...PHASE_ORDER.filter(p => byPhase[p]), ...Object.keys(byPhase).filter(p => !PHASE_ORDER.includes(p))];
 
     const group = mk('div', 'camp-group');
     const row   = mk('div', 'camp-row');
-    const lbl   = mk('div', 'camp-lbl');
-    const nm    = mk('div', 'camp-name'); nm.textContent = campName;
-    const mt    = mk('div', 'camp-meta'); mt.textContent = `${done}/${cms.length} complete`;
-    lbl.append(nm, mt);
+
+    // Label column
+    const lbl = mk('div', 'camp-lbl');
+
+    const nm = mk('div', 'camp-name'); nm.textContent = campName; lbl.appendChild(nm);
+
+    const st = mk('div', 'camp-status');
+    const stDot = mk('span', 'dot'); stDot.style.background = statusColor(campStatus);
+    st.appendChild(stDot);
+    const stTxt = mk('span'); stTxt.textContent = campStatus.toUpperCase(); stTxt.style.color = statusColor(campStatus);
+    st.appendChild(stTxt);
+    lbl.appendChild(st);
+
+    if (launchDate) {
+      const ld = mk('div', 'camp-dates');
+      ld.textContent = 'Launch ' + fmtDate(launchDate);
+      lbl.appendChild(ld);
+    }
+
     row.appendChild(lbl);
 
+    // Timeline column
     const tl = mk('div', 'camp-tl');
+
+    // Find overall campaign date range for bg bar
+    const campStart = Math.min(...cms.map(m => m.startDate).filter(Boolean));
+    const campEnd   = Math.max(...cms.map(m => m.endDate || m.startDate).filter(Boolean));
 
     phases.forEach((phase, pi) => {
       const lane = mk('div', 'phase-lane');
 
+      // Grid lines
       months.forEach(m => {
         const gl = mk('div', 'grid-line'); gl.style.left = pct(m.getTime()); lane.appendChild(gl);
       });
 
+      // Today line (first phase only)
       if (pi === 0 && today >= rMin && today <= rMax) {
         const tll = mk('div', 'today-line'); tll.style.left = pct(today); lane.appendChild(tll);
         const tlb = mk('div', 'today-lbl'); tlb.style.left = pct(today); tlb.textContent = 'TODAY'; lane.appendChild(tlb);
       }
 
+      // Background bar (full campaign span, first phase only)
+      if (pi === 0 && campStart && campEnd) {
+        const bg = mk('div', 'tl-bg');
+        bg.style.left  = pct(campStart);
+        bg.style.width = pct(campEnd - campStart);
+        lane.appendChild(bg);
+      }
+
+      // Milestone dots
       byPhase[phase].forEach(m => {
         if (!m.startDate) return;
-        const color = m.status === 'Done' ? 'var(--phase-done)' : phaseColor(phase);
+        const color = phaseColor(phase);
+        const isDone = m.status === 'Done';
 
+        // Duration bar
         if (m.endDate && m.endDate > m.startDate) {
           const bar = mk('div', 'ms-bar');
-          bar.style.left = pct(m.startDate);
-          bar.style.width = pct(m.endDate - m.startDate);
+          bar.style.left       = pct(m.startDate);
+          bar.style.width      = pct(m.endDate - m.startDate);
           bar.style.background = color;
           lane.appendChild(bar);
         }
 
-        const dot = mk('div', 'ms-dot' + (m.status === 'Done' ? ' done' : ''));
-        dot.style.left = pct(m.startDate);
-        dot.style.background = color;
-        if (m.status !== 'Done') dot.style.boxShadow = `0 0 8px ${color}50`;
-        dot.addEventListener('mouseenter', e => showTT(e, m, phase, color));
+        // Dot
+        const dot = mk('div', 'ms-dot' + (isDone ? ' done' : ''));
+        dot.style.left       = pct(m.startDate);
+        dot.style.background = isDone ? 'var(--done)' : color;
+        dot.style.borderColor = 'var(--cream)';
+
+        dot.addEventListener('mouseenter', e => showTT(e, m, phase, isDone ? 'var(--done)' : color));
         dot.addEventListener('mousemove',  e => moveTT(e));
         dot.addEventListener('mouseleave', hideTT);
         lane.appendChild(dot);
+
+        // Short label below dot
+        const lbl2 = mk('div', 'ms-label');
+        lbl2.style.left = pct(m.startDate);
+        lbl2.textContent = shortName(m.name);
+        lane.appendChild(lbl2);
       });
 
       tl.appendChild(lane);
     });
 
     row.appendChild(tl);
+
+    // Key dates sidebar
+    const kd = mk('div', 'camp-key');
+    const kl = mk('div', 'key-label'); kl.textContent = 'Key Dates'; kd.appendChild(kl);
+    keyDates.forEach(m => {
+      const kdt = mk('div', 'key-date');
+      kdt.textContent = fmtDateShort(m.startDate);
+      kd.appendChild(kdt);
+    });
+    if (!keyDates.length) {
+      const kdt = mk('div', 'key-date'); kdt.textContent = 'Waiting'; kdt.style.color = 'var(--muted)'; kd.appendChild(kdt);
+    }
+    row.appendChild(kd);
+
     group.appendChild(row);
     root.appendChild(group);
   });
 }
 
-// ── TOOLTIP ──────────────────────────────────────
+// ── TOOLTIP ──────────────────────────────────────────
 const tooltip = document.getElementById('tt');
 function showTT(e, m, phase, color) {
   document.getElementById('tt-phase').textContent = phase;
-  document.getElementById('tt-phase').style.color = color;
   document.getElementById('tt-name').textContent  = m.name;
   const s = fmtDate(m.startDate), end = fmtDate(m.endDate);
   document.getElementById('tt-dates').textContent =
-    (end && end !== s) ? `${s} → ${end}${m.duration ? '  ('+m.duration+' days)' : ''}` : (s || '—');
+    (end && end !== s) ? `${s} → ${end}${m.duration ? '  ('+m.duration+'d)' : ''}` : (s || '—');
   const st = document.getElementById('tt-status');
-  st.innerHTML = `<span class="dot" style="background:${color}"></span>${m.status||'—'}${m.channel?' · '+m.channel:''}`;
+  const dotHtml = `<span class="tt-dot" style="background:${statusColor(m.status)}"></span>`;
+  st.innerHTML = dotHtml + (m.status || '—') + (m.channel ? ' · ' + m.channel : '');
   moveTT(e); tooltip.classList.add('on');
 }
 function moveTT(e) {
-  const tw = tooltip.offsetWidth || 250, th = tooltip.offsetHeight || 110;
+  const tw = tooltip.offsetWidth || 240, th = tooltip.offsetHeight || 100;
   tooltip.style.left = (e.clientX+14+tw > window.innerWidth  ? e.clientX-tw-14 : e.clientX+14) + 'px';
   tooltip.style.top  = (e.clientY-10+th > window.innerHeight ? e.clientY-th    : e.clientY-10) + 'px';
 }
 function hideTT() { tooltip.classList.remove('on'); }
 
-// ── UTILS ─────────────────────────────────────────
+// ── UTILS ─────────────────────────────────────────────
 function mk(tag, cls) { const e = document.createElement(tag); if (cls) e.className = cls; return e; }
 function groupBy(arr, key) {
   return arr.reduce((acc, item) => {
@@ -501,6 +792,31 @@ function bestDate(...candidates) {
 function fmtDate(ts) {
   if (!ts) return null;
   return new Date(ts).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+function fmtDateShort(ts) {
+  if (!ts) return '';
+  return new Date(ts).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+function shortName(name) {
+  // Shorten long milestone names for label under dot
+  if (!name) return '';
+  if (name.length <= 18) return name;
+  const abbrevs = {
+    'Campaign Kick-Off': 'Kick-Off',
+    'Campaign Kick-off': 'Kick-Off',
+    'First Half Campaign Plan': '1st Half Plan',
+    'Second Half Campaign Plan': '2nd Half Plan',
+    'Finalized Campaign Plan Deck': 'Campaign Deck',
+    'Finalized Campaign Deck': 'Campaign Deck',
+    'Briefing Request in Notion': 'Briefing Req.',
+    'Finalized Creative Asset Delivered': 'Creative Delivered',
+    'Retailer In-Store Launch': 'Retailer Launch',
+    'Retailer Launch': 'Retailer Launch',
+  };
+  for (const [k, v] of Object.entries(abbrevs)) {
+    if (name.toLowerCase().includes(k.toLowerCase())) return v;
+  }
+  return name.slice(0, 16) + '…';
 }
 function setMsg(t) {
   const m = document.getElementById('msg');
